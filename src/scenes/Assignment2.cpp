@@ -19,7 +19,10 @@ Assignment2::Assignment2()
       showTrajectory(true),
       steps(50),
       previewTime(4.0f),
-      trajectoryMethod(5) {}
+      trajectoryMethod(5),
+      distanceAfterThrowOnGround(-1.0f),
+      firstCollisionTime(0),
+      collisionPosition() {}
 
 Assignment2::~Assignment2() {}
 
@@ -111,6 +114,12 @@ void Assignment2::DrawGUI() {
     ImGui::DragInt("Steps", &steps, 0.1f, 0, 500);
     ImGui::DragFloat("Preview Time", &previewTime, 0.1f, 1.0f, 10.0f);
     ImGui::DragInt("Calculation Method", &trajectoryMethod, 0.1f, 0, 5);
+    if (distanceAfterThrowOnGround >= 0) {
+        ImGui::Text("First Collision with Ground:");
+        ImGui::Text("Distance From Original Position: %.2f", distanceAfterThrowOnGround);
+        ImGui::Text("Time: %.2f", firstCollisionTime);
+        ImGui::Text("X Position: %.2f", collisionPosition.x);
+    }
 
     ImGui::End();
 }
@@ -153,6 +162,7 @@ void Assignment2::DrawTrajectoryWithGroundCollision(float previewTime, glm::vec2
     circle.Acceleration = circle.TotalForce * inverseMass;
 
     float intersectionTime = GetNextIntersectionTime(previewTime, circle, impulse, inverseMass);
+    distanceAfterThrowOnGround = DistanceFromOriginalPositionWhenCircleHitsGround(circle.Position, circle.Velocity, circle.Acceleration, intersectionTime);
     float deltaTime = previewTime / steps;
     
     for (int i = 0; i < steps; ++i) {
@@ -328,4 +338,13 @@ float Assignment2::GetNextIntersectionTime(float previewTime, Circle& circle, gl
             return -1.0f;
         }
     }
+}
+
+float Assignment2::DistanceFromOriginalPositionWhenCircleHitsGround(glm::vec2 startPosition, glm::vec2 startVelocity, glm::vec2 acceleration, float collisionTime) {
+    float powerTo2 = glm::pow(collisionTime, 2);
+    collisionPosition = startPosition + startVelocity * collisionTime +
+                        0.5f * acceleration * powerTo2;
+    firstCollisionTime = collisionTime;
+    return std::sqrt(std::pow(startPosition.x - collisionPosition.x, 2) +
+                     std::pow(startPosition.y - collisionPosition.y, 2));
 }

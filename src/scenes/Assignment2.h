@@ -31,6 +31,9 @@ public:
     float previewTime;
     int trajectoryMethod;
     int impulseCircleIndex;
+    float distanceAfterThrowOnGround;
+    float firstCollisionTime;
+    glm::vec2 collisionPosition;
 
     bool mouseDown;
     glm::vec2 mousePosition;
@@ -40,6 +43,7 @@ public:
     void Assignment2::DrawTrajectory(float previewTime, glm::vec2 impulse, int steps);
     void Assignment2::DrawTrajectoryWithGroundCollision(float previewTime, glm::vec2 impulse, int steps);
     float Assignment2::GetNextIntersectionTime(float previewTime, Circle& circle, glm::vec2 impulse, float inverseMass);
+    float Assignment2::DistanceFromOriginalPositionWhenCircleHitsGround(glm::vec2 startPosition, glm::vec2 startVelocity, glm::vec2 acceleration, float collisionTime);
 
     int Assignment2::SetCurrentImpulseCircle();
     float Assignment2::GetInverseMass(float mass);
