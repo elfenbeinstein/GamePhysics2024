@@ -1,5 +1,6 @@
 #pragma once
 #include "core/Simple2DScene.h"
+#include "core/Colors.h"
 
 class Circle {
 public:
@@ -13,4 +14,6 @@ public:
     float Radius;
     float Mass;
     glm::vec2 TotalForce;
+    Color Color;
+    float ColorCountdown;
 };
