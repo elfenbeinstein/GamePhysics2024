@@ -4,13 +4,14 @@
 #include "scenes/Assignment3.h"
 #include "scenes/Assignment4.h"
 #include "scenes/Assignment5.h"
+#include "scenes/Assignment6.h"
 #include "scenes/TestScene.h"
 
 int main(int argc, char** argv) {
     // Add newly created scenes here so that they show up in the menu.
-    std::vector<Scene*> scenes = {new TestScene(), new Assignment1(),
-                                  new Assignment2(), new Assignment3(),
-                                  new Assignment4(), new Assignment5()};
+    std::vector<Scene*> scenes = {new Assignment1(), new Assignment2(),
+                                  new Assignment3(), new Assignment4(),
+                                  new Assignment5(), new Assignment6()};
     Application app(scenes);
     return app.Run();
 }

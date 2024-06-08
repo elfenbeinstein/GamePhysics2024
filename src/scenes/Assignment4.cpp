@@ -31,10 +31,10 @@ void Assignment4::OnDisable() {}
 
 void Assignment4::Update(float deltaTime) {
     for (auto& circle : circles) {
-        if (circle.Color == Colors::red) {
+        if (circle.Colour == Colors::red) {
             circle.ColorCountdown += deltaTime;
             if (circle.ColorCountdown > 0.3f)
-                circle.Color = Colors::white;
+                circle.Colour = Colors::white;
         }
     }
 
@@ -66,7 +66,7 @@ void Assignment4::Draw() {
     Draw::SetColor(Colors::white);
 
     for (const auto& circle : circles) {
-        Draw::SetColor(circle.Color);
+        Draw::SetColor(circle.Colour);
         Draw::Circle(circle.Position, circle.Radius);
     }
     Draw::SetColor(Colors::white);
@@ -186,9 +186,9 @@ void Assignment4::CheckForCollisionBetweenCircles(Circle& circle1, Circle& circl
     if (distance > circle1.Radius + circle2.Radius)
         return;
     
-    circle1.Color = Colors::red;
+    circle1.Colour = Colors::red;
     circle1.ColorCountdown = 0.0f;
-    circle2.Color = Colors::red;
+    circle2.Colour = Colors::red;
     circle2.ColorCountdown = 0.0f;
 
     float intersectionDepth = circle1.Radius + circle2.Radius - distance;
@@ -226,9 +226,9 @@ void Assignment4::CheckForCollisionBetweenCirclesTakingMassIntoAccount(
     if (distance > circle1.Radius + circle2.Radius)
         return;
 
-    circle1.Color = Colors::red;
+    circle1.Colour = Colors::red;
     circle1.ColorCountdown = 0.0f;
-    circle2.Color = Colors::red;
+    circle2.Colour = Colors::red;
     circle2.ColorCountdown = 0.0f;
 
     float totalMass = circle1.Mass + circle2.Mass;
