@@ -114,12 +114,12 @@ void Assignment2::DrawGUI() {
     ImGui::DragInt("Steps", &steps, 0.1f, 0, 500);
     ImGui::DragFloat("Preview Time", &previewTime, 0.1f, 1.0f, 10.0f);
     ImGui::DragInt("Calculation Method", &trajectoryMethod, 0.1f, 0, 5);
-    if (distanceAfterThrowOnGround >= 0) {
+    /*if (distanceAfterThrowOnGround >= 0) {
         ImGui::Text("First Collision with Ground:");
         ImGui::Text("Distance From Original Position: %.2f", distanceAfterThrowOnGround);
         ImGui::Text("Time: %.2f", firstCollisionTime);
         ImGui::Text("X Position: %.2f", collisionPosition.x);
-    }
+    }*/
 
     ImGui::End();
 }

@@ -6,6 +6,8 @@ PlayerInput::PlayerInput()
       leftMouseDown(false),
       mousePosition(),
       originalPosition(),
+      PreviewTime(1.0f),
+      PreviewSteps(4),
       selectedParticle(nullptr),
       originalColour() {}
 
@@ -14,6 +16,8 @@ PlayerInput::PlayerInput(InputType leftMouseInput)
       leftMouseDown(false),
       mousePosition(),
       originalPosition(),
+      PreviewTime(1.0f),
+      PreviewSteps(4),
       selectedParticle(nullptr),
       originalColour() {}
 
@@ -102,12 +106,10 @@ void PlayerInput::CalculateTrajectory() {
         return;
     trajectoryParticles.clear();
 
-    int steps = 4;
-    float previewTime = 1.0f;
     std::shared_ptr<Circle> circle = std::dynamic_pointer_cast<Circle>(selectedParticle);
 
-    for (int i = 1; i < steps + 1; ++i) {
-        float timeStep = previewTime / steps * i;
+    for (int i = 1; i < PreviewSteps + 1; ++i) {
+        float timeStep = PreviewTime / PreviewSteps * i;
         float powerTo2 = glm::pow(timeStep, 2);
         glm::vec2 velocity =
             circle->Velocity +

@@ -14,6 +14,8 @@ public:
     void Update(std::vector<std::shared_ptr<Particle>>& particles);
     std::shared_ptr<Particle> selectedParticle;
     InputType LeftMouseInputType;
+    int PreviewSteps;
+    float PreviewTime;
 
 private:
     bool leftMouseDown;

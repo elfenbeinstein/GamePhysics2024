@@ -6,6 +6,7 @@
 #include "scenes/Assignment5.h"
 #include "scenes/Assignment6.h"
 #include "scenes/Assignment7.h"
+#include "scenes/Assignment8.h"
 #include "scenes/TestScene.h"
 
 int main(int argc, char** argv) {
@@ -13,7 +14,7 @@ int main(int argc, char** argv) {
     std::vector<Scene*> scenes = {new Assignment1(), new Assignment2(),
                                   new Assignment3(), new Assignment4(),
                                   new Assignment5(), new Assignment6(),
-                                  new Assignment7()};
+                                  new Assignment7(), new Assignment8()};
     Application app(scenes);
     return app.Run();
 }

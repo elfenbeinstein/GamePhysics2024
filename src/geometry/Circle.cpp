@@ -51,8 +51,29 @@ Circle::Circle(glm::vec2 pos,
       Radius(rad),
       ColorCountdown(0.0f) {}
 
+Circle::Circle(glm::vec2 pos,
+               glm::vec2 vel,
+               float rad,
+               float mass,
+               float damping,
+               float coefficientOfRestitution,
+               bool removeAfterCollision,
+               bool removeOtherAfterCollision,
+               bool canBeRemoved,
+               bool canBeMovedByMouse,
+               bool canAddImpulseByMouse,
+               Color colour)
+    : Particle(Particle::Circle, colour, mass, damping, coefficientOfRestitution, vel, {0.0f, 0.0f}, pos, removeAfterCollision, removeOtherAfterCollision, canBeRemoved, canBeMovedByMouse, canAddImpulseByMouse),
+      Acceleration(0, 0),
+      Radius(rad),
+      ColorCountdown(0.0f) {}
+
+
 void Circle::Draw() {
-    Draw::SetColor(Colour);
+    Color col = Colour;
+    if (ColorCountdown < 0.0f)
+        col = Colors::red;
+    Draw::SetColor(col);
     Draw::Circle(Position, Radius);
     Draw::SetColor(Colors::white);
 }
@@ -62,17 +83,11 @@ void Circle::Update(float deltaTime, glm::vec2 gravity) {
     AddForce(gravity * Mass);
     UpdateVelocity(deltaTime);
     Position += Velocity * deltaTime;
-
-    if (Colour == Colors::red) {
-        ColorCountdown += deltaTime;
-        if (ColorCountdown > 0.3f)
-            Colour = Colors::white;
-    }
+    ColorCountdown += deltaTime;
 }
 
 void Circle::OnCollision() {
-    Colour = Colors::red;
-    ColorCountdown = 0.0f;
+    ColorCountdown = -0.3f;
 }
 
 void Circle::Move(glm::vec2 previousMousePosition, glm::vec2 currentMousePosition) {
