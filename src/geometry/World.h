@@ -12,17 +12,20 @@ class World {
 public:
     World();
     World(glm::vec2 gravity);
+    World(glm::vec2 gravity, bool applyDrag, bool resolveCollisionsInelastic);
 
-    void Update(std::vector<std::shared_ptr<Particle>>& particles, float deltaTime, std::vector<std::shared_ptr<Particle>>& particlesToRemove, std::vector<std::shared_ptr<Particle>>& selectedParticles);
+    void Update(std::vector<std::shared_ptr<Particle>>& particles, float deltaTime, std::vector<std::shared_ptr<Particle>>& particlesToRemove, std::shared_ptr<Particle>& selectedParticle);
 
     bool IsColliding(std::shared_ptr<Circle> circle1, std::shared_ptr<Circle> circle2, float& intersectionDepth, glm::vec2& collisionNormal);
     bool IsColliding(std::shared_ptr<Circle> circle, std::shared_ptr<Line> line, float& intersectionDepth, glm::vec2& collisionNormal);
     bool IsColliding(std::shared_ptr<Circle> circle, std::shared_ptr<AxisAlignedBox>box, float& intersectionDepth, glm::vec2& collisionNormal);
 
-    void ResolveCollision(std::shared_ptr<Particle> particle1, std::shared_ptr<Particle> particle2, const float& intersectionDepth, const glm::vec2& collisionNormal);
+    void ResolveCollision(std::shared_ptr<Particle> particle1, std::shared_ptr<Particle> particle2, const float& intersectionDepth, glm::vec2& collisionNormal);
     void SetCollisionCallback(CollisionCallback callback);
 
     glm::vec2 Gravity;
+    bool ApplyDrag;
+    bool ResolveCollisionsInelastic;
 
 private:
     CollisionCallback collisionCallback;

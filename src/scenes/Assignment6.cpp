@@ -42,28 +42,29 @@ void Assignment6::Update(float deltaTime) {
     std::vector<std::shared_ptr<Particle>> particlesToRemove;
     playerInput.Update(particles);
 
-    world.Update(particles, deltaTime, particlesToRemove, playerInput.selectedParticles);
+    world.Update(particles, deltaTime, particlesToRemove, playerInput.selectedParticle);
 
     // player paddle constraints
-    if (playerPaddle->BottomLeft.x < left) {
-        playerPaddle->BottomLeft.x = left;
-        playerPaddle->TopRight.x = left + paddleWidth;
+    if (playerPaddle->Position.x < left) {
+        playerPaddle->Position.x = left;
+        playerPaddle->TopRightOffset.x = left + paddleWidth;
+    } else if (playerPaddle->TopRightOffset.x > right) {
+        playerPaddle->TopRightOffset.x = right;
+        playerPaddle->Position.x = right - paddleWidth;
     }
-    else if (playerPaddle->TopRight.x > right) {
-        playerPaddle->TopRight.x = right;
-        playerPaddle->BottomLeft.x = right - paddleWidth;
-    }
-    if (playerPaddle->BottomLeft.y < paddleY) {
-        playerPaddle->BottomLeft.y = paddleY;
-        playerPaddle->TopRight.y = paddleY + paddleHeight;
-    } else if (playerPaddle->BottomLeft.y > paddleY) {
-        playerPaddle->BottomLeft.y = paddleY;
-        playerPaddle->TopRight.y = paddleY + paddleHeight;
+    if (playerPaddle->Position.y < paddleY) {
+        playerPaddle->Position.y = paddleY;
+        playerPaddle->TopRightOffset.y = paddleY + paddleHeight;
+    } else if (playerPaddle->Position.y > paddleY) {
+        playerPaddle->Position.y = paddleY;
+        playerPaddle->TopRightOffset.y = paddleY + paddleHeight;
     }
 
     //move new ball with paddle
     if (newBall != nullptr) {
-        newBall->Position = glm::vec2(playerPaddle->BottomLeft.x + paddleWidth/2.0f, playerPaddle->TopRight.y + ballRadius);
+        newBall->Position =
+            glm::vec2(playerPaddle->Position.x + paddleWidth / 2.0f,
+                      playerPaddle->TopRightOffset.y + ballRadius);
     }
 
     // release ball when space bar is pressed
@@ -172,8 +173,8 @@ void Assignment6::SetUpGame() {
 
 void Assignment6::AddNewBall() {
     newBall = std::make_shared<Circle>(
-        glm::vec2(playerPaddle->BottomLeft.x + paddleWidth / 2.0f,
-                  playerPaddle->TopRight.y + ballRadius),
+        glm::vec2(playerPaddle->Position.x + paddleWidth / 2.0f,
+                  playerPaddle->TopRightOffset.y + ballRadius),
        startVelocity, ballRadius, 1.0f, false, true, true, false, false);
 }
 
@@ -187,6 +188,6 @@ void Assignment6::OnCollision(std::shared_ptr<Particle>& particle1, std::shared_
     } else
         return;
 
-    float factor = circle->Position.x - (playerPaddle->BottomLeft.x + paddleWidth / 2.0f);
+    float factor = circle->Position.x - (playerPaddle->Position.x + paddleWidth / 2.0f);
     circle->AddImpulse(glm::vec2(factor * paddleImpulse, 0.0f));
 }

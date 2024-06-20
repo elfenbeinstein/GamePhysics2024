@@ -72,7 +72,7 @@ void Assignment4::Draw() {
     Draw::SetColor(Colors::white);
 
     for (const auto& line : lines) {
-        Draw::Line(line.Start, line.End);
+        Draw::Line(line.Position, line.EndOffset);
     }
 }
 
@@ -134,8 +134,8 @@ void Assignment4::CheckForCollisionWithLines(Circle& circle) {
         float intersectionDepth = 0.0f;
 
         float distanceToStartSquared =
-            std::pow(line.Start.x - circle.Position.x, 2) +
-            std::pow(line.Start.y - circle.Position.y, 2);
+            std::pow(line.Position.x - circle.Position.x, 2) +
+            std::pow(line.Position.y - circle.Position.y, 2);
         if (distanceToStartSquared <= radiusSquared) {
             intersectionDepth =
                 std::sqrt(radiusSquared - distanceToStartSquared);
@@ -144,8 +144,8 @@ void Assignment4::CheckForCollisionWithLines(Circle& circle) {
         }
 
         float distanceToEndSquared =
-            std::pow(line.End.x - circle.Position.x, 2) +
-            std::pow(line.End.y - circle.Position.y, 2);
+            std::pow(line.EndOffset.x - circle.Position.x, 2) +
+            std::pow(line.EndOffset.y - circle.Position.y, 2);
         if (distanceToEndSquared <= radiusSquared) {
             intersectionDepth = std::sqrt(radiusSquared - distanceToEndSquared);
             ResolveCollision(circle, line, intersectionDepth);
@@ -163,7 +163,7 @@ void Assignment4::CheckForCollisionWithLines(Circle& circle) {
         float distanceClosestPointFromEnd =
             glm::sqrt(distanceToEndSquared + glm::pow(projectedDistance, 2));
 
-        float lineLength = glm::distance(line.Start, line.End);
+        float lineLength = glm::distance(line.Position, line.EndOffset);
 
         if (distanceClosestPointFromStart > lineLength ||
             distanceClosestPointFromEnd > lineLength)
@@ -232,7 +232,7 @@ void Assignment4::CheckForCollisionBetweenCirclesTakingMassIntoAccount(
     circle2.ColorCountdown = 0.0f;
 
     float totalMass = circle1.Mass + circle2.Mass;
-    if (totalMass == 0.0f)
+    if (totalMass < 0.0001f)
         return;
 
     float massRatio1 = circle1.Mass / totalMass;
@@ -243,8 +243,14 @@ void Assignment4::CheckForCollisionBetweenCirclesTakingMassIntoAccount(
                         (circle2.Position.y - circle1.Position.y) / distance);
 
     if (intersectionDepth > 0) {
-        circle1.Position -= direction * (intersectionDepth * massRatio1);
-        circle2.Position += direction * (intersectionDepth * massRatio2);
+        if (circle2.Mass < 0.0001f) {
+            circle1.Position -= direction * intersectionDepth;
+        } else if (circle1.Mass < 0.0001f) {
+            circle2.Position += direction * intersectionDepth;
+        } else {
+            circle1.Position -= direction * (intersectionDepth * massRatio2);
+            circle2.Position += direction * (intersectionDepth * massRatio1);
+        }
     }
     
     if (circle1.Mass == 0.0f) {

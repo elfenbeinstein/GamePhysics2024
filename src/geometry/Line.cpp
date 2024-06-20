@@ -3,9 +3,8 @@
 #include "core/Draw.h"
 
 Line::Line()
-    : Particle(Particle::Line, Colors::blue, 0.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, false, false, false),
-      Start(-10.0f, 0.0f),
-      End(10.0f, 0.0f),
+    : Particle(Particle::Line, Colors::blue, 0.0f, 0.0f, 1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, false, false, false, false, false),
+      EndOffset(10.0f, 0.0f),
       Normal(),
       Direction(),
       ProjectionOntoNormal(0.0f) {
@@ -13,9 +12,8 @@ Line::Line()
 }
 
 Line::Line(glm::vec2 start, glm::vec2 end) 
-    : Particle(Particle::Line, Colors::blue, 0.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, false, false, false), 
-      Start(start),
-      End(end),
+    : Particle(Particle::Line, Colors::blue, 0.0f, 0.0f, 1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, start, false, false, false, false, false), 
+      EndOffset(end),
       Normal(),
       Direction(),
       ProjectionOntoNormal(0.0f) {
@@ -23,9 +21,8 @@ Line::Line(glm::vec2 start, glm::vec2 end)
 }
 
 Line::Line(glm::vec2 start, glm::vec2 end, bool deleteCollidingParticle, bool canBeRemoved)
-    : Particle(Particle::Line, Colors::blue, 0.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, false, deleteCollidingParticle, canBeRemoved),
-      Start(start),
-      End(end),
+    : Particle(Particle::Line, Colors::blue, 0.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, start, false, deleteCollidingParticle, canBeRemoved, false, false),
+      EndOffset(end),
       Normal(),
       Direction(),
       ProjectionOntoNormal(0.0f) {
@@ -33,13 +30,13 @@ Line::Line(glm::vec2 start, glm::vec2 end, bool deleteCollidingParticle, bool ca
 }
 
 void Line::CalculateNormal() {
-    Direction = End - Start;
+    Direction = EndOffset - Position;
     Normal = glm::normalize(glm::vec2{-Direction.y, Direction.x});
-    ProjectionOntoNormal = glm::dot(Start, Normal);
+    ProjectionOntoNormal = glm::dot(Position, Normal);
 }
 
 void Line::Draw() {
     Draw::SetColor(Colour);
-    Draw::Line(Start, End);
+    Draw::Line(Position, EndOffset);
     Draw::SetColor(Colors::white);
 }

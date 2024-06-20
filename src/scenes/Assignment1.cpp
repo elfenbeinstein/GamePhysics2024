@@ -65,11 +65,11 @@ void Assignment1::Draw() {
     }
 
     for (const auto& line : horizontalLines) {
-        Draw::Line(line.Start, line.End);
+        Draw::Line(line.Position, line.EndOffset);
     }
 
     for (const auto& line : verticalLines) {
-        Draw::Line(line.Start, line.End);
+        Draw::Line(line.Position, line.EndOffset);
     }
 }
 
@@ -117,29 +117,29 @@ Circle Assignment1::CreateRandomCircle() {
 
 void Assignment1::CheckForCollisions(Circle& circle) {
     for (const auto& line : horizontalLines) {
-        if (!CollidesWithInfinite(circle.Position.y, line.End.y, circle.Radius))
+        if (!CollidesWithInfinite(circle.Position.y, line.EndOffset.y, circle.Radius))
             continue;
         
-        bool collidesWithStart = CollidesWithEndpoint(circle.Position, line.Start, circle.Radius);
-        bool collidesWithEnd = CollidesWithEndpoint(circle.Position, line.End, circle.Radius);
+        bool collidesWithStart = CollidesWithEndpoint(circle.Position, line.Position, circle.Radius);
+        bool collidesWithEnd = CollidesWithEndpoint(circle.Position, line.EndOffset, circle.Radius);
         
-        if (!IsBetweenEndpoints(circle.Position.x, line.Start.x, line.End.x) 
+        if (!IsBetweenEndpoints(circle.Position.x, line.Position.x, line.EndOffset.x) 
             && !collidesWithEnd && !collidesWithStart)
             continue;
 
         // still a little wonky reset, but best try so far
         if (collidesWithEnd || collidesWithStart) {
             float distanceCrossed = collidesWithStart
-                    ? std::abs(circle.Radius - VectorDistance(circle.Position, line.Start))
-                    : std::abs(circle.Radius - VectorDistance(circle.Position, line.End));
+                    ? std::abs(circle.Radius - VectorDistance(circle.Position, line.Position))
+                    : std::abs(circle.Radius - VectorDistance(circle.Position, line.EndOffset));
 
             glm::vec2 direction = glm::normalize(circle.Velocity);
             glm::vec2 moveBackVector = direction * distanceCrossed;
             circle.Position -= moveBackVector;
         } else {
             circle.Position.y = circle.Velocity.y >= 0
-                                    ? line.End.y - circle.Radius
-                                    : line.End.y + circle.Radius;
+                                    ? line.EndOffset.y - circle.Radius
+                                    : line.EndOffset.y + circle.Radius;
         }
 
         circle.Velocity.y *= -1.0f;
@@ -148,29 +148,29 @@ void Assignment1::CheckForCollisions(Circle& circle) {
     }
 
     for (const auto& line : verticalLines) {
-        if (!CollidesWithInfinite(circle.Position.x, line.End.x, circle.Radius))
+        if (!CollidesWithInfinite(circle.Position.x, line.EndOffset.x, circle.Radius))
             continue;
         
-        bool collidesWithStart = CollidesWithEndpoint(circle.Position, line.Start, circle.Radius);
-        bool collidesWithEnd = CollidesWithEndpoint(circle.Position, line.End, circle.Radius);
+        bool collidesWithStart = CollidesWithEndpoint(circle.Position, line.Position, circle.Radius);
+        bool collidesWithEnd = CollidesWithEndpoint(circle.Position, line.EndOffset, circle.Radius);
         
-        if (!IsBetweenEndpoints(circle.Position.y, line.Start.y, line.End.y) &&
+        if (!IsBetweenEndpoints(circle.Position.y, line.Position.y, line.EndOffset.y) &&
             !collidesWithEnd && !collidesWithStart)
             continue;
 
         //still a little wonky reset but best try so far
         if (collidesWithEnd || collidesWithStart) {
             float distanceCrossed = collidesWithStart
-                    ? std::abs(circle.Radius - VectorDistance(circle.Position, line.Start))
-                    : std::abs(circle.Radius - VectorDistance(circle.Position, line.End));
+                    ? std::abs(circle.Radius - VectorDistance(circle.Position, line.Position))
+                    : std::abs(circle.Radius - VectorDistance(circle.Position, line.EndOffset));
 
             glm::vec2 direction = glm::normalize(circle.Velocity);
             glm::vec2 moveBackVector = direction * distanceCrossed;
             circle.Position -= moveBackVector;
         } else {
             circle.Position.x = circle.Velocity.x >= 0
-                                    ? line.End.x - circle.Radius
-                                    : line.End.x + circle.Radius;
+                                    ? line.EndOffset.x - circle.Radius
+                                    : line.EndOffset.x + circle.Radius;
         }
         
         circle.Velocity.x *= -1.0f;
@@ -182,7 +182,7 @@ void Assignment1::CheckForCollisions(Circle& circle) {
 
 bool Assignment1::CollidedWithHorizontalLine(Circle& circle) {
     for (const auto& line : horizontalLines) {
-        if (std::abs(circle.Position.y - line.End.y) > circle.Radius)
+        if (std::abs(circle.Position.y - line.EndOffset.y) > circle.Radius)
             continue;
 
         // first try: but was really wonky in corners
@@ -190,17 +190,17 @@ bool Assignment1::CollidedWithHorizontalLine(Circle& circle) {
             circle.Position.x >= line.End.x + circle.Radius)
             continue;*/
 
-        if (circle.Position.x < line.Start.x &&
-            VectorDistance(circle.Position, line.Start) > circle.Radius)
+        if (circle.Position.x < line.Position.x &&
+            VectorDistance(circle.Position, line.Position) > circle.Radius)
             continue;
 
-        if (circle.Position.x > line.End.x && 
-            VectorDistance(circle.Position, line.End) > circle.Radius)
+        if (circle.Position.x > line.EndOffset.x && 
+            VectorDistance(circle.Position, line.EndOffset) > circle.Radius)
             continue;
 
         // resetting is wonky if it hits endpoints in specific ways
-        circle.Position.y = circle.Velocity.y >= 0 ? line.End.y - circle.Radius
-                                                   : line.End.y + circle.Radius;
+        circle.Position.y = circle.Velocity.y >= 0 ? line.EndOffset.y - circle.Radius
+                                                   : line.EndOffset.y + circle.Radius;
 
         return true;
     }
@@ -209,27 +209,27 @@ bool Assignment1::CollidedWithHorizontalLine(Circle& circle) {
 
 bool Assignment1::CollidedWithVerticalLine(Circle& circle) {
     for (const auto& line : verticalLines) {
-        if (std::abs(circle.Position.x - line.End.x) > circle.Radius)
+        if (std::abs(circle.Position.x - line.EndOffset.x) > circle.Radius)
             continue;
 
         //first try: but was really wonky in corners
-        /*if (circle.Position.y <= line.Start.y - circle.Radius ||
-            circle.Position.y >= line.End.y + circle.Radius)
+        /*if (circle.Position.y <= line.Position.y - circle.Radius ||
+            circle.Position.y >= line.EndOffset.y + circle.Radius)
             continue;*/
 
-        if (circle.Position.y < line.Start.y &&
-            VectorDistance(circle.Position, line.Start) >
+        if (circle.Position.y < line.Position.y &&
+            VectorDistance(circle.Position, line.Position) >
                 circle.Radius)
             continue;
 
-        if (circle.Position.y > line.End.y &&
-            VectorDistance(circle.Position, line.End) >
+        if (circle.Position.y > line.EndOffset.y &&
+            VectorDistance(circle.Position, line.EndOffset) >
                 circle.Radius)
             continue;
 
         // resetting is wonky if it hits endpoints in specific ways
-        circle.Position.x = circle.Velocity.x >= 0 ? line.End.x - circle.Radius
-                                                   : line.End.x + circle.Radius;
+        circle.Position.x = circle.Velocity.x >= 0 ? line.EndOffset.x - circle.Radius
+                                                   : line.EndOffset.x + circle.Radius;
 
         return true;
     }

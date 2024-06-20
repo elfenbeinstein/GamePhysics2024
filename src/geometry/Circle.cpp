@@ -4,22 +4,19 @@
 #include "core/Draw.h"
 
 Circle::Circle()
-    : Particle(Particle::Circle, Colors::white, 1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}),
-      Position(0, 0),
+    : Particle(Particle::Circle, Colors::white, 1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}),
       Acceleration(0, 0),
       Radius(0.5f),
       ColorCountdown(0.0f) {}
 
 Circle::Circle(glm::vec2 pos, glm::vec2 vel, float rad)
-    : Particle(Particle::Circle, Colors::white, 1.0f, vel, {0.0f, 0.0f}),
-      Position(pos),
+    : Particle(Particle::Circle, Colors::white, 1.0f, vel, {0.0f, 0.0f}, pos),
       Acceleration(0, 0),
       Radius(rad),
       ColorCountdown(0.0f) {}
 
 Circle::Circle(glm::vec2 pos, glm::vec2 vel, float rad, float mass) 
-    : Particle(Particle::Circle, Colors::white, mass, vel, {0.0f, 0.0f}),
-      Position(pos),
+    : Particle(Particle::Circle, Colors::white, mass, vel, {0.0f, 0.0f}, pos),
       Acceleration(0, 0),
       Radius(rad),
       ColorCountdown(0.0f) {}
@@ -33,7 +30,23 @@ Circle::Circle(glm::vec2 pos,
     bool canBeRemoved,
     bool canBeMovedByMouse,
     bool canAddImpulseByMouse)
-    : Particle(Particle::Circle, Colors::white, mass, vel, {0.0f, 0.0f}, removeAfterCollision, removeOtherAfterCollision, canBeRemoved, canBeMovedByMouse, canAddImpulseByMouse), Position(pos),
+    : Particle(Particle::Circle, Colors::white, mass, vel, {0.0f, 0.0f}, pos, removeAfterCollision, removeOtherAfterCollision, canBeRemoved, canBeMovedByMouse, canAddImpulseByMouse), 
+      Acceleration(0, 0),
+      Radius(rad),
+      ColorCountdown(0.0f) {}
+
+Circle::Circle(glm::vec2 pos,
+               glm::vec2 vel,
+               float rad,
+               float mass,
+               float damping,
+               float coefficientOfRestitution,
+               bool removeAfterCollision,
+               bool removeOtherAfterCollision,
+               bool canBeRemoved,
+               bool canBeMovedByMouse,
+               bool canAddImpulseByMouse)
+    : Particle(Particle::Circle, Colors::white, mass, damping, coefficientOfRestitution, vel, {0.0f, 0.0f}, pos, removeAfterCollision, removeOtherAfterCollision, canBeRemoved, canBeMovedByMouse, canAddImpulseByMouse),
       Acceleration(0, 0),
       Radius(rad),
       ColorCountdown(0.0f) {}

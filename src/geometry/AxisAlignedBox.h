@@ -19,8 +19,7 @@ public:
                                    bool moveByMouseDrag,
                                    bool canAddImpulse);
 
-    glm::vec2 BottomLeft;
-    glm::vec2 TopRight;
+    glm::vec2 TopRightOffset;
 
     void Draw() override;
 

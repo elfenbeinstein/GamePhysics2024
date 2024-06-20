@@ -3,28 +3,24 @@
 #include "core/Draw.h"
 
 AxisAlignedBox::AxisAlignedBox()
-    : Particle(Particle::AABB, Colors::white, 0.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, true, false, true, false, false),
-      BottomLeft(0.0f, 0.0f),
-      TopRight(1.0f, 1.0f) {}
+    : Particle(Particle::AABB, Colors::white, 0.0f, 0.0f, 1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, true, false, true, false, false),
+      TopRightOffset(1.0f, 1.0f) {}
 
 AxisAlignedBox::AxisAlignedBox(glm::vec2 bottomLeft, glm::vec2 topRight)
-    : Particle(Particle::AABB, Colors::white, 0.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, true, false, true, false, false),
-      BottomLeft(bottomLeft),
-      TopRight(topRight) {}
+    : Particle(Particle::AABB, Colors::white, 0.0f, 0.0f, 1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, bottomLeft, true, false, true, false, false),
+      TopRightOffset(topRight) {}
 
 AxisAlignedBox::AxisAlignedBox(glm::vec2 bottomLeft, glm::vec2 topRight, bool removeAfterCol, bool moveByMouseDrag)
-    : Particle(Particle::AABB, Colors::white, 0.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, removeAfterCol, false, true, moveByMouseDrag, false),
-      BottomLeft(bottomLeft),
-      TopRight(topRight) {}
+    : Particle(Particle::AABB, Colors::white, 0.0f, 0.0f, 1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, bottomLeft, removeAfterCol, false, true, moveByMouseDrag, false),
+      TopRightOffset(topRight) {}
 
 AxisAlignedBox::AxisAlignedBox(glm::vec2 bottomLeft, glm::vec2 topRight, bool removeAfterCol, bool removeOtherAfterCol, bool canBeRemoved, bool moveByMouseDrag, bool canAddImpulse)
-    : Particle(Particle::AABB, Colors::white, 0.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, removeAfterCol, removeOtherAfterCol, canBeRemoved, moveByMouseDrag, canAddImpulse),
-      BottomLeft(bottomLeft),
-      TopRight(topRight){}
+    : Particle(Particle::AABB, Colors::white, 0.0f, 0.0f, 1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, bottomLeft, removeAfterCol, removeOtherAfterCol, canBeRemoved, moveByMouseDrag, canAddImpulse),
+      TopRightOffset(topRight) {}
 
 void AxisAlignedBox::Draw() {
     Draw::SetColor(Colour);
-    Draw::AABB(BottomLeft, TopRight);
+    Draw::AABB(Position, TopRightOffset);
     Draw::SetColor(Colors::white);
 }
 
@@ -36,12 +32,12 @@ bool AxisAlignedBox::IsMouseOverParticle(glm::vec2 mousePosition) {
 }
 
 void AxisAlignedBox::Move(glm::vec2 previousMousePosition, glm::vec2 currentMousePosition) {
-    BottomLeft += currentMousePosition - previousMousePosition;
-    TopRight += currentMousePosition - previousMousePosition;
+    Position += currentMousePosition - previousMousePosition;
+    TopRightOffset += currentMousePosition - previousMousePosition;
 }
 
 glm::vec2 AxisAlignedBox::ClosestPoint(glm::vec2 otherPosition) {
-    float x = glm::clamp(otherPosition.x, BottomLeft.x, TopRight.x);
-    float y = glm::clamp(otherPosition.y, BottomLeft.y, TopRight.y);
+    float x = glm::clamp(otherPosition.x, Position.x, TopRightOffset.x);
+    float y = glm::clamp(otherPosition.y, Position.y, TopRightOffset.y);
     return {x, y};
 }

@@ -8,8 +8,8 @@ public:
     Circle(glm::vec2 pos, glm::vec2 vel, float rad);
     Circle(glm::vec2 pos, glm::vec2 vel, float rad, float mass);
     Circle(glm::vec2 pos, glm::vec2 vel, float rad, float mass, bool removeAfterCollision, bool removeOtherAfterCollision, bool canBeRemoved, bool canBeMovedByMouse, bool canAddImpulseByMouse);
+    Circle(glm::vec2 pos, glm::vec2 vel, float rad, float mass, float damping, float coefficientOfRestitution,  bool removeAfterCollision, bool removeOtherAfterCollision, bool canBeRemoved, bool canBeMovedByMouse, bool canAddImpulseByMouse);
 
-    glm::vec2 Position;
     glm::vec2 Acceleration;
     float Radius;
     float ColorCountdown;

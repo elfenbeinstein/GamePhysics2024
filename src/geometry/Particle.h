@@ -7,9 +7,10 @@ public:
     enum ParticleType { None, Circle, Line, AABB };
 
     Particle::Particle();
-    Particle::Particle(ParticleType type, Color colour, float mass, glm::vec2 velocity, glm::vec2 totalForce);
-    Particle::Particle(ParticleType type, Color colour, float mass, glm::vec2 velocity, glm::vec2 totalForce, bool removeAfterCol, bool removeOtherAfterCol, bool canBeRemoved);
-    Particle::Particle(ParticleType type, Color colour, float mass, glm::vec2 velocity, glm::vec2 totalForce, bool removeAfterCol, bool removeOtherAfterCol, bool canBeRemoved, bool canBeMoved, bool canAddImpulse);
+    Particle::Particle(ParticleType type, Color colour, float mass, glm::vec2 velocity, glm::vec2 totalForce, glm::vec2 position);
+    Particle::Particle(ParticleType type, Color colour, float mass, glm::vec2 velocity, glm::vec2 totalForce, glm::vec2 position, bool removeAfterCol, bool removeOtherAfterCol, bool canBeRemoved);
+    Particle::Particle(ParticleType type, Color colour, float mass, glm::vec2 velocity, glm::vec2 totalForce, glm::vec2 position, bool removeAfterCol, bool removeOtherAfterCol, bool canBeRemoved, bool canBeMoved, bool canAddImpulse);
+    Particle::Particle(ParticleType type, Color colour, float mass, float damping, float coefficientOfRestitution, glm::vec2 velocity, glm::vec2 totalForce, glm::vec2 position, bool removeAfterCol, bool removeOtherAfterCol, bool canBeRemoved, bool canBeMoved, bool canAddImpulse);
 
     float GetInverseMass(float mass);
     void AddImpulse(glm::vec2 impulse);
@@ -27,8 +28,11 @@ public:
     Color Colour;
     float Mass;
     float InverseMass;
+    float Damping;
+    float CoefficientOfRestitution;
     glm::vec2 Velocity;
     glm::vec2 TotalForce;
+    glm::vec2 Position;
 
     bool RemoveThisAfterCollision;
     bool RemoveOtherParticleAfterCollision;

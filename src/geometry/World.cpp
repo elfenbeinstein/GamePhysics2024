@@ -1,21 +1,29 @@
 #include "World.h"
 
-World::World() : Gravity({0, -9.81f}) {}
-World::World(glm::vec2 gravity) : Gravity(gravity) {}
+World::World()
+    : Gravity({0, -9.81f}), ApplyDrag(false), ResolveCollisionsInelastic(false) {}
+
+World::World(glm::vec2 gravity)
+    : Gravity(gravity), ApplyDrag(false), ResolveCollisionsInelastic(false) {}
+
+World::World(glm::vec2 gravity, bool applyDrag, bool resolveCollisionsInelastic)
+    : Gravity(gravity),
+      ApplyDrag(applyDrag),
+      ResolveCollisionsInelastic(resolveCollisionsInelastic) {}
 
 void World::SetCollisionCallback(CollisionCallback callback) {
     collisionCallback = callback;
 }
 
-void World::Update(std::vector<std::shared_ptr<Particle>>& particles, float deltaTime, std::vector<std::shared_ptr<Particle>>& particlesToRemove, std::vector<std::shared_ptr<Particle>>& selectedParticles) {
+void World::Update(std::vector<std::shared_ptr<Particle>>& particles, float deltaTime, std::vector<std::shared_ptr<Particle>>& particlesToRemove, std::shared_ptr<Particle>& selectedParticle) {
     for (auto& particle : particles) {
         bool skipParticle = false;
-        for (auto& selected : selectedParticles)
-            if (particle == selected)
-                skipParticle = true;
-        if (skipParticle)
+        if (particle == selectedParticle)
             continue;
         particle->Update(deltaTime, Gravity);
+        if (ApplyDrag) {
+            particle->Velocity *= 1.0f - particle->Damping * deltaTime;
+        }
     }
 
     for (int i = 0; i < particles.size(); ++i) {
@@ -35,9 +43,6 @@ void World::Update(std::vector<std::shared_ptr<Particle>>& particles, float delt
         float intersectionDepth;
 
         for (int j = i + 1; j < particles.size(); ++j) {
-            std::shared_ptr<Particle> particle1;
-            std::shared_ptr<Particle> particle2;
-
             if (particles[i]->Type == Particle::Circle &&
                 particles[j]->Type == Particle::Circle) {
                 isColliding =
@@ -70,8 +75,7 @@ void World::Update(std::vector<std::shared_ptr<Particle>>& particles, float delt
                                 intersectionDepth, normal);
             }
             if (isColliding) {
-                ResolveCollision(particles[i], particles[j], intersectionDepth,
-                                 normal);
+                ResolveCollision(particles[i], particles[j], intersectionDepth, normal);
 
                 if (collisionCallback) {
                     collisionCallback(particles[i], particles[j]);
@@ -123,8 +127,8 @@ bool World::IsColliding(std::shared_ptr<Circle> circle1, std::shared_ptr<Circle>
 bool World::IsColliding(std::shared_ptr<Circle> circle, std::shared_ptr<Line> line, float& intersectionDepth, glm::vec2& collisionNormal) {
     float radiusSquared = std::pow(circle->Radius, 2);
     float distanceToStartSquared =
-        std::pow(line->Start.x - circle->Position.x, 2) +
-        std::pow(line->Start.y - circle->Position.y, 2);
+        std::pow(line->Position.x - circle->Position.x, 2) +
+        std::pow(line->Position.y - circle->Position.y, 2);
     collisionNormal = line->Normal;
 
 
@@ -133,8 +137,8 @@ bool World::IsColliding(std::shared_ptr<Circle> circle, std::shared_ptr<Line> li
         return true;
     }
 
-    float distanceToEndSquared = std::pow(line->End.x - circle->Position.x, 2) +
-                                 std::pow(line->End.y - circle->Position.y, 2);
+    float distanceToEndSquared = std::pow(line->EndOffset.x - circle->Position.x, 2) +
+                                 std::pow(line->EndOffset.y - circle->Position.y, 2);
     if (distanceToEndSquared <= radiusSquared) {
         intersectionDepth = std::sqrt(radiusSquared - distanceToEndSquared);
         return true;
@@ -150,7 +154,7 @@ bool World::IsColliding(std::shared_ptr<Circle> circle, std::shared_ptr<Line> li
     float distanceClosestPointFromEnd = glm::sqrt(
         distanceToEndSquared + glm::pow(glm::abs(projectedDistance), 2));
 
-    float lineLength = glm::distance(line->Start, line->End);
+    float lineLength = glm::distance(line->Position, line->EndOffset);
 
     if (distanceClosestPointFromStart > lineLength ||
         distanceClosestPointFromEnd > lineLength)
@@ -177,40 +181,42 @@ bool World::IsColliding(std::shared_ptr<Circle> circle, std::shared_ptr<AxisAlig
     return true;
 }
 
-void World::ResolveCollision(std::shared_ptr<Particle> particle1, std::shared_ptr<Particle> particle2, const float& intersectionDepth, const glm::vec2& collisionNormal) {
-    if (particle1->Type == Particle::Circle &&
-        particle2->Type == Particle::Circle) {
-        std::shared_ptr<Circle> circle1 = std::dynamic_pointer_cast<Circle>(particle1);
-        std::shared_ptr<Circle> circle2 = std::dynamic_pointer_cast<Circle>(particle2);
-        float distance =
-            std::sqrt(std::pow(circle2->Position.x - circle1->Position.x, 2) +
-                      std::pow(circle2->Position.y - circle1->Position.y, 2));
-        glm::vec2 direction(
-            (circle2->Position.x - circle1->Position.x) / distance,
-            (circle2->Position.y - circle1->Position.y) / distance);
-        float totalMass = circle1->Mass + circle2->Mass;
-        if (totalMass == 0.0f)
-            return;
-        float massRatio1 = circle1->Mass / totalMass;
-        float massRatio2 = circle2->Mass / totalMass;
-        circle1->Position -= direction * (intersectionDepth * massRatio1);
-        circle2->Position += direction * (intersectionDepth * massRatio2);
-        particle1->Velocity -= 2.0f * glm::dot(particle1->Velocity, collisionNormal) * collisionNormal;
-        particle2->Velocity -= 2.0f * glm::dot(particle2->Velocity, -collisionNormal) * -collisionNormal;
+void World::ResolveCollision(std::shared_ptr<Particle> particle1, std::shared_ptr<Particle> particle2, const float& intersectionDepth, glm::vec2& collisionNormal) {
+    float totalMass = particle1->Mass + particle2->Mass;
+    if (totalMass < 0.0001f)
         return;
-    }
-    
-    
-    if (particle1->Type == Particle::Circle && particle1->Mass > 0) {
-        std::dynamic_pointer_cast<Circle>(particle1)->Position += intersectionDepth * collisionNormal;
-        particle1->Velocity -= 2.0f * glm::dot(particle1->Velocity, collisionNormal) * collisionNormal;
-    }
-    if (particle2->Type == Particle::Circle && particle2->Mass > 0) {
-        std::dynamic_pointer_cast<Circle>(particle2)->Position += intersectionDepth * collisionNormal;
-        particle2->Velocity -= 2.0f * glm::dot(particle2->Velocity, collisionNormal) * collisionNormal;
+
+    if (particle2->Type == Particle::Circle && particle2->Type != Particle::Circle) {
+        collisionNormal = -collisionNormal;
     }
 
-    // this did not work because I always calculate the normal and depth and stuff with using the circle as particle 1 so I need to do this accordingly
-    /*particle1->Velocity -= 2.0f * glm::dot(particle1->Velocity, collisionNormal) * collisionNormal;
-    particle2->Velocity -= 2.0f * glm::dot(particle2->Velocity, -collisionNormal) * -collisionNormal;*/
+    if (particle2->Mass < 0.0001f) {
+        particle1->Position -= collisionNormal * intersectionDepth;
+    } else if (particle1->Mass < 0.0001f) {
+        particle2->Position += collisionNormal * intersectionDepth;
+    } else {
+        float massRatio1 = particle1->Mass / totalMass;
+        float massRatio2 = particle2->Mass / totalMass;
+
+        particle1->Position -= collisionNormal * (intersectionDepth * massRatio2);
+        particle2->Position += collisionNormal * (intersectionDepth * massRatio1);
+    }
+
+
+    if (ResolveCollisionsInelastic) {
+        float coefficient = particle1->CoefficientOfRestitution;
+        if (particle2->CoefficientOfRestitution < coefficient)
+            coefficient = particle2->CoefficientOfRestitution;
+
+        float impulseMagnitude =
+            (-(1.0f + coefficient) * glm::dot((particle2->Velocity - particle1->Velocity),
+                           collisionNormal)) /
+            (particle1->InverseMass + particle2->InverseMass);
+
+        particle1->AddImpulse(impulseMagnitude * -collisionNormal);
+        particle2->AddImpulse(impulseMagnitude * collisionNormal);
+    } else {
+        particle1->Velocity -= 2.0f * glm::dot(particle1->Velocity, collisionNormal) * collisionNormal;
+        particle2->Velocity -= 2.0f * glm::dot(particle2->Velocity, -collisionNormal) * -collisionNormal;
+    }
 }
