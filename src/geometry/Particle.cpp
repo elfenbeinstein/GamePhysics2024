@@ -21,82 +21,6 @@ Particle::Particle()
 Particle::Particle(ParticleType type,
                    Color colour,
                    float mass,
-                   glm::vec2 velocity,
-                   glm::vec2 totalForce,
-                   glm::vec2 position)
-    : Type(type),
-      Colour(colour),
-      Mass(mass),
-      Velocity(velocity),
-      TotalForce(totalForce),
-      Position(position),
-      InverseMass(),
-      Damping(0.0f),
-      CoefficientOfRestitution(1.0f),
-      RemoveThisAfterCollision(false),
-      RemoveOtherParticleAfterCollision(false),
-      CanBeRemovedOnCollision(true),
-      CanBeMovedByMouse(false),
-      CanAddImpulseByMouse(false) {
-    InverseMass = GetInverseMass(Mass);
-}
-
-Particle::Particle(ParticleType type,
-                   Color colour,
-                   float mass,
-                   glm::vec2 velocity,
-                   glm::vec2 totalForce,
-                   glm::vec2 position,
-                   bool removeAfterCol,
-                   bool removeOtherAfterCol, bool canBeRemoved)
-    : Type(type),
-      Colour(colour),
-      Mass(mass),
-      Velocity(velocity),
-      TotalForce(totalForce),
-      Position(position),
-      InverseMass(),
-      Damping(0.0f),
-      CoefficientOfRestitution(1.0f),
-      RemoveThisAfterCollision(removeAfterCol),
-      RemoveOtherParticleAfterCollision(removeOtherAfterCol),
-      CanBeRemovedOnCollision(canBeRemoved),
-      CanBeMovedByMouse(false),
-      CanAddImpulseByMouse(false) {
-    InverseMass = GetInverseMass(Mass);
-}
-
-Particle::Particle(ParticleType type,
-                   Color colour,
-                   float mass,
-                   glm::vec2 velocity,
-                   glm::vec2 totalForce,
-                   glm::vec2 position,
-                   bool removeAfterCol,
-                   bool removeOtherAfterCol,
-                   bool canBeRemoved,
-                   bool canBeMoved,
-                   bool canAddImpulse)
-    : Type(type),
-      Colour(colour),
-      Mass(mass),
-      Velocity(velocity),
-      TotalForce(totalForce),
-      Position(position),
-      InverseMass(),
-      Damping(0.0f),
-      CoefficientOfRestitution(1.0f),
-      RemoveThisAfterCollision(removeAfterCol),
-      RemoveOtherParticleAfterCollision(removeOtherAfterCol),
-      CanBeRemovedOnCollision(canBeRemoved),
-      CanBeMovedByMouse(canBeMoved),
-      CanAddImpulseByMouse(canAddImpulse) {
-    InverseMass = GetInverseMass(Mass);
-}
-
-Particle::Particle(ParticleType type,
-                   Color colour,
-                   float mass,
                    float damping,
                    float coefficientOfRestitution, 
                    glm::vec2 velocity,
@@ -139,11 +63,6 @@ void Particle::AddForce(const glm::vec2& force) {
  }
 
  void Particle::Update(float deltaTime, glm::vec2 gravity) {}
-
- void Particle::UpdateVelocity(float deltaTime) {
-     glm::vec2 acceleration = TotalForce * InverseMass;
-     Velocity += acceleration * deltaTime;
- }
  
  void Particle::OnCollision() {}
 

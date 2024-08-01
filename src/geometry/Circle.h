@@ -1,24 +1,30 @@
 #pragma once
 #include "core/Simple2DScene.h"
 #include "geometry/Particle.h"
+#include "geometry/RigidBody.h"
 
-class Circle : public Particle {
+class Circle : public RigidBody {
 public:
     Circle();
-    Circle(glm::vec2 pos, glm::vec2 vel, float rad);
-    Circle(glm::vec2 pos, glm::vec2 vel, float rad, float mass);
-    Circle(glm::vec2 pos, glm::vec2 vel, float rad, float mass, bool removeAfterCollision, bool removeOtherAfterCollision, bool canBeRemoved, bool canBeMovedByMouse, bool canAddImpulseByMouse);
-    Circle(glm::vec2 pos, glm::vec2 vel, float rad, float mass, float damping, float coefficientOfRestitution,  bool removeAfterCollision, bool removeOtherAfterCollision, bool canBeRemoved, bool canBeMovedByMouse, bool canAddImpulseByMouse);
-    Circle(glm::vec2 pos, glm::vec2 vel, float rad, float mass, float damping, float coefficientOfRestitution,  bool removeAfterCollision, bool removeOtherAfterCollision, bool canBeRemoved, bool canBeMovedByMouse, bool canAddImpulseByMouse, Color colour);
-
+    Circle(glm::vec2 pos,
+           glm::vec2 vel = {0.0f, 0.0f},
+           float rad = 1.0f,
+           float mass = 1.0f,
+           float damping = 0.0f,
+           float coefficientOfRestitution = 1.0f,
+           bool removeAfterCollision = false,
+           bool removeOtherAfterCollision = false,
+           bool canBeRemoved = true,
+           bool canBeMovedByMouse = false,
+           bool canAddImpulseByMouse = false,
+           Color colour = Colors::white,
+           float angle = 0.0f,
+           float angularDamp = 0.0f,
+           float angularVel = 0.0f);
+    
     glm::vec2 Acceleration;
     float Radius;
-    float ColorCountdown;
 
     void Draw() override;
-    void Update(float deltaTime, glm::vec2 gravity) override;
-    void OnCollision() override;
-    void Move(glm::vec2 previousMousePosition, glm::vec2 currentMousePosition) override;
-
     bool IsMouseOverParticle(glm::vec2 mousePosition) override;
 };

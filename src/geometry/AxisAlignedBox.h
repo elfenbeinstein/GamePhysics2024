@@ -6,18 +6,20 @@
 class AxisAlignedBox : public Particle {
 public:
     AxisAlignedBox();
-    AxisAlignedBox(glm::vec2 bottomLeft, glm::vec2 topRight);
     AxisAlignedBox(glm::vec2 bottomLeft,
                    glm::vec2 topRight,
-                   bool removeAfterCol,
-                   bool moveByMouseDrag);
-    AxisAlignedBox::AxisAlignedBox(glm::vec2 bottomLeft,
-                                   glm::vec2 topRight,
-                                   bool removeAfterCol,
-                                   bool removeOtherAfterCol,
-                                   bool canBeRemoved,
-                                   bool moveByMouseDrag,
-                                   bool canAddImpulse);
+                   glm::vec2 vel = {0.0f, 0.0f},
+                   glm::vec2 totalForce = {0.0f, 0.0f},
+                   float rad = 1.0f,
+                   float mass = 1.0f,
+                   float damping = 0.0f,
+                   float coefficientOfRestitution = 1.0f,
+                   bool removeAfterCollision = false,
+                   bool removeOtherAfterCollision = false,
+                   bool canBeRemoved = true,
+                   bool canBeMovedByMouse = false,
+                   bool canAddImpulseByMouse = false,
+                   Color color = Colors::white);
 
     glm::vec2 TopRightOffset;
 

@@ -17,7 +17,6 @@ void World::SetCollisionCallback(CollisionCallback callback) {
 
 void World::Update(std::vector<std::shared_ptr<Particle>>& particles, float deltaTime, std::vector<std::shared_ptr<Particle>>& particlesToRemove, std::shared_ptr<Particle>& selectedParticle) {
     for (auto& particle : particles) {
-        bool skipParticle = false;
         if (particle == selectedParticle)
             continue;
         particle->Update(deltaTime, Gravity);
@@ -27,17 +26,6 @@ void World::Update(std::vector<std::shared_ptr<Particle>>& particles, float delt
     }
 
     for (int i = 0; i < particles.size(); ++i) {
-        std::shared_ptr<Circle> circle;
-        std::shared_ptr<Line> line;
-        std::shared_ptr<AxisAlignedBox> box;
-        if (particles[i]->Type == Particle::Circle) {
-            circle = std::dynamic_pointer_cast<Circle>(particles[i]);
-        } else if (particles[i]->Type == Particle::Line) {
-            line = std::dynamic_pointer_cast<Line>(particles[i]);
-        } else if (particles[i]->Type == Particle::AABB) {
-            box = std::dynamic_pointer_cast<AxisAlignedBox>(particles[i]);
-        }
-
         bool isColliding = false;
         glm::vec2 normal;
         float intersectionDepth;
@@ -46,34 +34,77 @@ void World::Update(std::vector<std::shared_ptr<Particle>>& particles, float delt
             if (particles[i]->Type == Particle::Circle &&
                 particles[j]->Type == Particle::Circle) {
                 isColliding =
-                    IsColliding(circle,
+                    IsColliding(std::dynamic_pointer_cast<Circle>(particles[i]),
                                 std::dynamic_pointer_cast<Circle>(particles[j]),
                                 intersectionDepth, normal);
             } else if (particles[i]->Type == Particle::Circle &&
                        particles[j]->Type == Particle::Line) {
                 isColliding =
-                    IsColliding(circle,
+                    IsColliding(std::dynamic_pointer_cast<Circle>(particles[i]),
                                 std::dynamic_pointer_cast<Line>(particles[j]),
                                 intersectionDepth, normal);
             } else if (particles[i]->Type == Particle::Circle &&
                        particles[j]->Type == Particle::AABB) {
-                isColliding =
-                    IsColliding(circle,
-                                std::dynamic_pointer_cast<AxisAlignedBox>(particles[j]),
-                                intersectionDepth, normal);
+                isColliding = IsColliding(
+                    std::dynamic_pointer_cast<Circle>(particles[i]),
+                    std::dynamic_pointer_cast<AxisAlignedBox>(particles[j]),
+                    intersectionDepth, normal);
+            } else if (particles[i]->Type == Particle::Circle &&
+                       particles[j]->Type == Particle::Rectangle) {
+                isColliding = IsColliding(
+                    std::dynamic_pointer_cast<Rectangle>(particles[j]),
+                    std::dynamic_pointer_cast<Circle>(particles[i]),
+                    intersectionDepth, normal);
             } else if (particles[i]->Type == Particle::Line &&
                        particles[j]->Type == Particle::Circle) {
                 isColliding =
                     IsColliding(std::dynamic_pointer_cast<Circle>(particles[j]),
-                                line,
+                                std::dynamic_pointer_cast<Line>(particles[i]),
                                 intersectionDepth, normal);
+            } else if (particles[i]->Type == Particle::Line &&
+                       particles[j]->Type == Particle::Rectangle) {
+                isColliding = IsColliding(
+                    std::dynamic_pointer_cast<Rectangle>(particles[j]),
+                    std::dynamic_pointer_cast<Line>(particles[i]),
+                    intersectionDepth, normal);
             } else if (particles[i]->Type == Particle::AABB &&
                        particles[j]->Type == Particle::Circle) {
-                isColliding =
-                    IsColliding(std::dynamic_pointer_cast<Circle>(particles[j]),
-                                box,
-                                intersectionDepth, normal);
-            }
+                isColliding = IsColliding(
+                    std::dynamic_pointer_cast<Circle>(particles[j]),
+                    std::dynamic_pointer_cast<AxisAlignedBox>(particles[i]),
+                    intersectionDepth, normal);
+            } else if (particles[i]->Type == Particle::AABB &&
+                       particles[j]->Type == Particle::Rectangle) {
+                isColliding = IsColliding(
+                    std::dynamic_pointer_cast<Rectangle>(particles[j]),
+                    std::dynamic_pointer_cast<AxisAlignedBox>(particles[i]),
+                    intersectionDepth, normal);
+            } else if (particles[i]->Type == Particle::Rectangle &&
+                       particles[j]->Type == Particle::Rectangle) {
+                isColliding = IsColliding(
+                    std::dynamic_pointer_cast<Rectangle>(particles[i]),
+                    std::dynamic_pointer_cast<Rectangle>(particles[j]),
+                    intersectionDepth, normal);
+            } else if (particles[i]->Type == Particle::Rectangle &&
+                       particles[j]->Type == Particle::Circle) {
+                isColliding = IsColliding(
+                    std::dynamic_pointer_cast<Rectangle>(particles[i]),
+                    std::dynamic_pointer_cast<Circle>(particles[j]),
+                    intersectionDepth, normal);
+            } else if (particles[i]->Type == Particle::Rectangle &&
+                       particles[j]->Type == Particle::Line) {
+                isColliding = IsColliding(
+                    std::dynamic_pointer_cast<Rectangle>(particles[i]),
+                    std::dynamic_pointer_cast<Line>(particles[j]),
+                    intersectionDepth, normal);
+            } else if (particles[i]->Type == Particle::Rectangle &&
+                       particles[j]->Type == Particle::AABB) {
+                isColliding = IsColliding(
+                    std::dynamic_pointer_cast<Rectangle>(particles[i]),
+                    std::dynamic_pointer_cast<AxisAlignedBox>(particles[j]),
+                    intersectionDepth, normal);
+            } 
+
             if (isColliding) {
                 ResolveCollision(particles[i], particles[j], intersectionDepth, normal);
 
@@ -100,26 +131,9 @@ bool World::IsColliding(std::shared_ptr<Circle> circle1, std::shared_ptr<Circle>
                   std::pow(circle2->Position.y - circle1->Position.y, 2));
     if (distance > circle1->Radius + circle2->Radius)
         return false;
-
-    circle1->OnCollision();
-    circle2->OnCollision();
-
     intersectionDepth = circle1->Radius + circle2->Radius - distance;
-    if (intersectionDepth > 0) {
-        glm::vec2 direction(
-            (circle2->Position.x - circle1->Position.x) / distance,
-            (circle2->Position.y - circle1->Position.y) / distance);
-        if (circle1->Mass > 0.0f)
-            circle1->Position -= direction * (intersectionDepth / 2.0f + 0.05f);
-        if (circle2->Mass > 0.0f)
-            circle2->Position += direction * (intersectionDepth / 2.0f + 0.05f);
-    }
-
-    glm::vec2 middle =
-        glm::vec2((circle1->Position.x + circle2->Position.x) / 2.0f,
-                  (circle1->Position.y + circle2->Position.y) / 2.0f);
-    collisionNormal = glm::normalize(glm::vec2(
-        circle1->Position.x - middle.x, circle1->Position.y - middle.y));
+    collisionNormal = glm::normalize(glm::vec2(circle2->Position.x - circle1->Position.x,
+                                               circle2->Position.y - circle1->Position.y));
 
     return true;
 }
@@ -181,10 +195,28 @@ bool World::IsColliding(std::shared_ptr<Circle> circle, std::shared_ptr<AxisAlig
     return true;
 }
 
+bool World::IsColliding(std::shared_ptr<Rectangle> rectA, std::shared_ptr<Rectangle> rectB, float& intersectionDepth, glm::vec2& collisionNormal) {
+    return false;
+}
+
+bool World::IsColliding(std::shared_ptr<Rectangle> rectangle, std::shared_ptr<Line> line, float& intersectionDepth, glm::vec2& collisionNormal) {
+    return false;
+}
+
+bool World::IsColliding(std::shared_ptr<Rectangle> rectangle, std::shared_ptr<AxisAlignedBox> box, float& intersectionDepth, glm::vec2& collisionNormal) {
+    return false;
+}
+
+bool World::IsColliding(std::shared_ptr<Rectangle> rectangle, std::shared_ptr<Circle> circle, float& intersectionDepth, glm::vec2& collisionNormal) {
+    return false;
+}
+
 void World::ResolveCollision(std::shared_ptr<Particle> particle1, std::shared_ptr<Particle> particle2, const float& intersectionDepth, glm::vec2& collisionNormal) {
     float totalMass = particle1->Mass + particle2->Mass;
     if (totalMass < 0.0001f)
         return;
+    particle1->OnCollision();
+    particle2->OnCollision();
 
     if (particle2->Type == Particle::Circle && particle2->Type != Particle::Circle) {
         collisionNormal = -collisionNormal;

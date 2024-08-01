@@ -6,16 +6,33 @@ AxisAlignedBox::AxisAlignedBox()
     : Particle(Particle::AABB, Colors::white, 0.0f, 0.0f, 1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, true, false, true, false, false),
       TopRightOffset(1.0f, 1.0f) {}
 
-AxisAlignedBox::AxisAlignedBox(glm::vec2 bottomLeft, glm::vec2 topRight)
-    : Particle(Particle::AABB, Colors::white, 0.0f, 0.0f, 1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, bottomLeft, true, false, true, false, false),
-      TopRightOffset(topRight) {}
-
-AxisAlignedBox::AxisAlignedBox(glm::vec2 bottomLeft, glm::vec2 topRight, bool removeAfterCol, bool moveByMouseDrag)
-    : Particle(Particle::AABB, Colors::white, 0.0f, 0.0f, 1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, bottomLeft, removeAfterCol, false, true, moveByMouseDrag, false),
-      TopRightOffset(topRight) {}
-
-AxisAlignedBox::AxisAlignedBox(glm::vec2 bottomLeft, glm::vec2 topRight, bool removeAfterCol, bool removeOtherAfterCol, bool canBeRemoved, bool moveByMouseDrag, bool canAddImpulse)
-    : Particle(Particle::AABB, Colors::white, 0.0f, 0.0f, 1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, bottomLeft, removeAfterCol, removeOtherAfterCol, canBeRemoved, moveByMouseDrag, canAddImpulse),
+AxisAlignedBox::AxisAlignedBox(glm::vec2 bottomLeft,
+                               glm::vec2 topRight,
+                               glm::vec2 vel,
+                               glm::vec2 totalForce,
+                               float rad,
+                               float mass,
+                               float damping,
+                               float coefficientOfRestitution,
+                               bool removeAfterCollision,
+                               bool removeOtherAfterCollision,
+                               bool canBeRemoved,
+                               bool canBeMovedByMouse,
+                               bool canAddImpulseByMouse,
+                               Color color)
+    : Particle(Particle::AABB,
+               color,
+               mass,
+               damping,
+               coefficientOfRestitution,
+               vel,
+               totalForce,
+               bottomLeft,
+               removeAfterCollision,
+               removeOtherAfterCollision,
+               canBeRemoved,
+               canBeMovedByMouse,
+               canAddImpulseByMouse),
       TopRightOffset(topRight) {}
 
 void AxisAlignedBox::Draw() {

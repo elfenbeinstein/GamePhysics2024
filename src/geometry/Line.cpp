@@ -11,8 +11,23 @@ Line::Line()
     CalculateNormal();
 }
 
-Line::Line(glm::vec2 start, glm::vec2 end) 
-    : Particle(Particle::Line, Colors::blue, 0.0f, 0.0f, 1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, start, false, false, false, false, false), 
+Line::Line(glm::vec2 start,
+           glm::vec2 end,
+           bool deleteCollidingParticle,
+           bool canBeRemoved)
+    : Particle(Particle::Line,
+               Colors::blue,
+               0.0f,
+               0.0f,
+               1.0f,
+               glm::vec2{0.0f, 0.0f},
+               glm::vec2{0.0f, 0.0f},
+               start,
+               false,
+               deleteCollidingParticle,
+               canBeRemoved,
+               false,
+               false),
       EndOffset(end),
       Normal(),
       Direction(),
@@ -20,8 +35,33 @@ Line::Line(glm::vec2 start, glm::vec2 end)
     CalculateNormal();
 }
 
-Line::Line(glm::vec2 start, glm::vec2 end, bool deleteCollidingParticle, bool canBeRemoved)
-    : Particle(Particle::Line, Colors::blue, 0.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, start, false, deleteCollidingParticle, canBeRemoved, false, false),
+Line::Line(glm::vec2 start,
+           glm::vec2 end,
+           float mass,
+           float damping,
+           float coefficientOfRestitution,
+           glm::vec2 vel,
+           glm::vec2 totalForce,
+           glm::vec2 position,
+           bool removeAfterCol,
+           bool deleteCollidingParticle,
+           bool canBeRemoved,
+           bool canBeMoved,
+           bool canAddImpulse,
+           Color color)
+    : Particle(Particle::Line,
+               color,
+               mass,
+               damping,
+               coefficientOfRestitution,
+               vel,
+               totalForce,
+               start,
+               removeAfterCol,
+               deleteCollidingParticle,
+               canBeRemoved,
+               canBeMoved,
+               canAddImpulse),
       EndOffset(end),
       Normal(),
       Direction(),

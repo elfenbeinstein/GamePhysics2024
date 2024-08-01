@@ -49,10 +49,10 @@ std::vector<glm::vec2> Math::GetRectangleWorldPoints(
     float angle,
     const glm::vec2& halfExtends) {
     std::vector<glm::vec2> points;
-    points.push_back(position + glm::vec2(-halfExtends.x, halfExtends.y));
-    points.push_back(position + glm::vec2(-halfExtends.x, -halfExtends.y));
-    points.push_back(position + glm::vec2(halfExtends.x, -halfExtends.y));
-    points.push_back(position + glm::vec2(halfExtends.x, halfExtends.y));
+    points.push_back(glm::vec2(-halfExtends.x, halfExtends.y));
+    points.push_back(glm::vec2(-halfExtends.x, -halfExtends.y));
+    points.push_back(glm::vec2(halfExtends.x, -halfExtends.y));
+    points.push_back(glm::vec2(halfExtends.x, halfExtends.y));
 
     return TransformPolygon(points, position, angle);
 }

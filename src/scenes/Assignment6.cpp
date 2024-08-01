@@ -8,12 +8,19 @@
 
 Assignment6::Assignment6()
     : playerPaddle(std::make_shared<AxisAlignedBox>(glm::vec2(-0.5f, -4.75f),
-                   glm::vec2(0.5f, -4.5f),
-                   false,
-                   false,
-                   false,
-                   true, 
-                   false)),
+                                                    glm::vec2(0.5f, -4.5f),
+                                                    glm::vec2{0.0f, 0.0f},
+                                                    glm::vec2{0.0f, 0.0f},
+                                                    1.0f,
+                                                    1.0f,
+                                                    0.0f,
+                                                    1.0f,
+                                                    false,
+                                                    false,
+                                                    false,
+                                                    true,
+                                                    false,
+                                                    Colors::white)),
       world(World(glm::vec2())),
       top(5.0f),
       bottom(-5.0f),
@@ -138,32 +145,98 @@ void Assignment6::SetUpGame() {
     particles.push_back(std::make_shared<Line>(glm::vec2(right, bottom), glm::vec2(right, top), false, false));
 
     // set up boxes
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(-2.75f, 4.25f), glm::vec2(-1.75f, 4.5f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(-1.25f, 4.25f), glm::vec2(-0.25f, 4.5f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(0.25f, 4.25f), glm::vec2(1.25f, 4.5f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(1.75f, 4.25f), glm::vec2(2.75f, 4.5f), true, false, true, false, false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(-2.75f, 4.25f), glm::vec2(-1.75f, 4.5f),
+        glm::vec2{0.0f, 0.0f}, glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f,
+        true, false, true, false, false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(-1.25f, 4.25f), glm::vec2(-0.25f, 4.5f),
+        glm::vec2{0.0f, 0.0f}, glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f,
+        true, false, true, false, false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(0.25f, 4.25f), glm::vec2(1.25f, 4.5f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
+        false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(1.75f, 4.25f), glm::vec2(2.75f, 4.5f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
+        false));
 
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(-3.5f, 3.5f), glm::vec2(-2.5f, 3.75f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(-2.0f, 3.5f), glm::vec2(-1.0f, 3.75f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(-0.5f, 3.5f), glm::vec2(0.5f, 3.75f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(1.0f, 3.5f), glm::vec2(2.0f, 3.75f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(2.5f, 3.5f), glm::vec2(3.5f, 3.75f), true, false, true, false, false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(-3.5f, 3.5f), glm::vec2(-2.5f, 3.75f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
+        false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(-2.0f, 3.5f), glm::vec2(-1.0f, 3.75f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
+        false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(-0.5f, 3.5f), glm::vec2(0.5f, 3.75f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
+        false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(1.0f, 3.5f), glm::vec2(2.0f, 3.75f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
+        false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(2.5f, 3.5f), glm::vec2(3.5f, 3.75f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
+        false));
 
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(-2.75f, 2.75f), glm::vec2(-1.75f, 3.0f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(-1.25f, 2.75f), glm::vec2(-0.25f, 3.0f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(0.25f, 2.75f), glm::vec2(1.25f, 3.0f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(1.75f, 2.75f), glm::vec2(2.75f, 3.0f), true, false, true, false, false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(-2.75f, 2.75f), glm::vec2(-1.75f, 3.0f),
+        glm::vec2{0.0f, 0.0f}, glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f,
+        true, false, true, false, false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(-1.25f, 2.75f), glm::vec2(-0.25f, 3.0f),
+        glm::vec2{0.0f, 0.0f}, glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f,
+        true, false, true, false, false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(0.25f, 2.75f), glm::vec2(1.25f, 3.0f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
+        false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(1.75f, 2.75f), glm::vec2(2.75f, 3.0f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
+        false));
 
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(-3.5f, 2.0f), glm::vec2(-2.5f, 2.25f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(-2.0f, 2.0f), glm::vec2(-1.0f, 2.25f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(-0.5f, 2.0f), glm::vec2(0.5f, 2.25f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(1.0f, 2.0f), glm::vec2(2.0f, 2.25f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(2.5f, 2.0f), glm::vec2(3.5f, 2.25f), true, false, true, false, false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(-3.5f, 2.0f), glm::vec2(-2.5f, 2.25f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
+        false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(-2.0f, 2.0f), glm::vec2(-1.0f, 2.25f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
+        false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(-0.5f, 2.0f), glm::vec2(0.5f, 2.25f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
+        false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(1.0f, 2.0f), glm::vec2(2.0f, 2.25f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
+        false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(2.5f, 2.0f), glm::vec2(3.5f, 2.25f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
+        false));
 
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(-2.75f, 1.25f), glm::vec2(-1.75f, 1.5f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(-1.25f, 1.25f), glm::vec2(-0.25f, 1.5f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(0.25f, 1.25f), glm::vec2(1.25f, 1.5f), true, false, true, false, false));
-    particles.push_back(std::make_shared<AxisAlignedBox>(glm::vec2(1.75f, 1.25f), glm::vec2(2.75f, 1.5f), true, false, true, false, false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(-2.75f, 1.25f), glm::vec2(-1.75f, 1.5f),
+        glm::vec2{0.0f, 0.0f}, glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f,
+        true, false, true, false, false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(-1.25f, 1.25f), glm::vec2(-0.25f, 1.5f),
+        glm::vec2{0.0f, 0.0f}, glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f,
+        true, false, true, false, false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(0.25f, 1.25f), glm::vec2(1.25f, 1.5f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
+        false));
+    particles.push_back(std::make_shared<AxisAlignedBox>(
+        glm::vec2(1.75f, 1.25f), glm::vec2(2.75f, 1.5f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
+        false));
 
     particles.push_back(playerPaddle);
     playerLives = 3;
