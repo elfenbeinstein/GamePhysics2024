@@ -7,6 +7,8 @@
 #include <memory>
 #include <vector>
 #include <functional>
+#include "core/PhysicsUtils.h"
+
 using CollisionCallback = std::function<void(std::shared_ptr<Particle>&, std::shared_ptr<Particle>&)>;
 
 class World {

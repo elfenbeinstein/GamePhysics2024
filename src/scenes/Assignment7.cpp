@@ -7,7 +7,7 @@ Assignment7::Assignment7()
       inputType(PlayerInput::Impulse),
       randomGenerator(RandomParticleGenerator()),
       particles() {
-    playerInput = PlayerInput::PlayerInput(PlayerInput::Impulse);
+    playerInput = PlayerInput::PlayerInput(PlayerInput::Impulse, false);
     ResetAll();
 }
 

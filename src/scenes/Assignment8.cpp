@@ -9,7 +9,7 @@ Assignment8::Assignment8()
       ballsCollected(0),
       winCount(0),
       particles() {
-    playerInput = PlayerInput::PlayerInput(PlayerInput::Impulse);
+    playerInput = PlayerInput::PlayerInput(PlayerInput::Impulse, false);
     playerInput.PreviewSteps = 6;
     playerInput.PreviewTime = 0.5f;
     ResetAll();

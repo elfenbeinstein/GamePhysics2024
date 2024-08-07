@@ -30,6 +30,8 @@ public:
     float ProjectionOntoNormal;
 
     void Draw() override;
+    bool IsMouseOverParticle(glm::vec2 mousePosition) override;
+    void Move(glm::vec2 previousMousePosition, glm::vec2 currentMousePosition) override;
 
 private:
     void Line::CalculateNormal();

@@ -196,19 +196,78 @@ bool World::IsColliding(std::shared_ptr<Circle> circle, std::shared_ptr<AxisAlig
 }
 
 bool World::IsColliding(std::shared_ptr<Rectangle> rectA, std::shared_ptr<Rectangle> rectB, float& intersectionDepth, glm::vec2& collisionNormal) {
-    return false;
+    return PhysicsUtils::IsCollidingRectRect(
+        rectA->Position, rectA->Angle, rectA->HalfExtends, rectB->Position,
+        rectB->Angle, rectB->HalfExtends, collisionNormal, intersectionDepth);
 }
 
 bool World::IsColliding(std::shared_ptr<Rectangle> rectangle, std::shared_ptr<Line> line, float& intersectionDepth, glm::vec2& collisionNormal) {
-    return false;
+    float minA, maxA, minB, maxB;
+    std::vector<glm::vec2> rectPoints = Math::GetRectangleWorldPoints(
+        rectangle->Position, rectangle->Angle, rectangle->HalfExtends);
+    std::vector<glm::vec2> linePoints;
+    linePoints.push_back(line->Position);
+    linePoints.push_back(line->EndOffset);
+
+    intersectionDepth = FLT_MAX;
+
+    for (int i = 0; i < rectPoints.size(); i++) {
+        glm::vec2 a = rectPoints[i];
+        glm::vec2 b = rectPoints[(i + 1) % rectPoints.size()];
+
+        glm::vec2 edge = b - a;
+        glm::vec2 normal = glm::normalize(glm::vec2(edge.y, -edge.x));
+
+        PhysicsUtils::ProjectPoints(rectPoints, normal, minA, maxA);
+        PhysicsUtils::ProjectPoints(linePoints, normal, minB, maxB);
+
+        if (minA >= maxB || minB >= maxA) {
+            return false;
+        }
+
+        float depth = std::min(maxA - minB, maxB - minA);
+        if (depth < intersectionDepth) {
+            intersectionDepth = depth;
+            collisionNormal = normal;
+        }
+    }
+
+    PhysicsUtils::ProjectPoints(rectPoints, line->Normal, minA, maxA);
+    PhysicsUtils::ProjectPoints(linePoints, line->Normal, minB, maxB);
+
+    if (minA >= maxB || minB >= maxA) {
+        return false;
+    }
+
+    float depth = std::min(maxA - minB, maxB - minA);
+    if (depth < intersectionDepth) {
+        intersectionDepth = depth;
+        collisionNormal = line->Normal;
+    }
+
+    glm::vec2 rectCenter =
+        (rectPoints[0] + rectPoints[1] + rectPoints[2] + rectPoints[3]) / 4.0f;
+    if (glm::dot(rectCenter - line->Position, collisionNormal) < 0) {
+        collisionNormal = -collisionNormal;
+    }
+
+    return true;
 }
 
 bool World::IsColliding(std::shared_ptr<Rectangle> rectangle, std::shared_ptr<AxisAlignedBox> box, float& intersectionDepth, glm::vec2& collisionNormal) {
-    return false;
+    glm::vec2 halfExtends = {0.0f, 0.0f};
+    halfExtends.x = (box->TopRight.x - box->Position.x) / 2.0f;
+    halfExtends.y = (box->TopRight.y - box->Position.y) / 2.0f;
+    glm::vec2 pos = box->Position + halfExtends;
+    return PhysicsUtils::IsCollidingRectRect(
+        rectangle->Position, rectangle->Angle, rectangle->HalfExtends, pos,
+        0.0f, halfExtends, collisionNormal, intersectionDepth);
 }
 
 bool World::IsColliding(std::shared_ptr<Rectangle> rectangle, std::shared_ptr<Circle> circle, float& intersectionDepth, glm::vec2& collisionNormal) {
-    return false;
+    return PhysicsUtils::IsCollidingCircleRect(
+        circle->Position, circle->Radius, rectangle->Position, rectangle->Angle,
+        rectangle->HalfExtends, collisionNormal, intersectionDepth);
 }
 
 void World::ResolveCollision(std::shared_ptr<Particle> particle1, std::shared_ptr<Particle> particle2, const float& intersectionDepth, glm::vec2& collisionNormal) {

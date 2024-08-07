@@ -81,7 +81,7 @@ void Assignment5::Draw() {
     }
 
     for (const auto& box : boxes) {
-        Draw::AABB(box.Position, box.TopRightOffset);
+        Draw::AABB(box.Position, box.TopRight);
     }
 
     if (mouseDown && impulseCircleIndex != -1 &&
@@ -117,8 +117,8 @@ void Assignment5::DrawGUI() {
 }
 
 glm::vec2 Assignment5::GetClosestPoint(AxisAlignedBox& box, Circle& circle) {
-    float x = glm::clamp(circle.Position.x, box.Position.x, box.TopRightOffset.x);
-    float y = glm::clamp(circle.Position.y, box.Position.y, box.TopRightOffset.y);
+    float x = glm::clamp(circle.Position.x, box.Position.x, box.TopRight.x);
+    float y = glm::clamp(circle.Position.y, box.Position.y, box.TopRight.y);
     return {x, y};
 }
 

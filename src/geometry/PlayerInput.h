@@ -5,13 +5,14 @@
 #include "geometry/Circle.h"
 #include "geometry/Rectangle.h"
 #include "geometry/Line.h"
+#include "geometry/AxisAlignedBox.h"
 #include <memory>
 
 class PlayerInput {
 public:
-    enum InputType { None, Impulse, Move, DrawRect, DrawCircle, DrawLine };
+    enum InputType { None, Impulse, Move, DrawRect, DrawCircle, DrawLine, DrawAABB, RemoveParticle};
     PlayerInput();
-    PlayerInput(InputType leftMouseInput);
+    PlayerInput(InputType leftMouseInput, bool applyImpulsiveTorque);
     void Draw();
     void Update(std::vector<std::shared_ptr<Particle>>& particles);
     std::shared_ptr<Particle> selectedParticle;
@@ -21,6 +22,7 @@ public:
 
 private:
     bool leftMouseDown;
+    bool ApplyImpulsiveTorque;
     glm::vec2 mousePosition;
     glm::vec2 originalPosition;
     std::vector<std::shared_ptr<Particle>> previewParticles;

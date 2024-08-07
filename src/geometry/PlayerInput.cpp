@@ -11,7 +11,7 @@ PlayerInput::PlayerInput()
       selectedParticle(nullptr),
       originalColour() {}
 
-PlayerInput::PlayerInput(InputType leftMouseInput)
+PlayerInput::PlayerInput(InputType leftMouseInput, bool applyImpulsiveTorque)
     : LeftMouseInputType(leftMouseInput),
       leftMouseDown(false),
       mousePosition(),
@@ -19,7 +19,8 @@ PlayerInput::PlayerInput(InputType leftMouseInput)
       PreviewTime(1.0f),
       PreviewSteps(4),
       selectedParticle(nullptr),
-      originalColour() {}
+      originalColour(),
+      ApplyImpulsiveTorque(applyImpulsiveTorque) {}
 
 void PlayerInput::Draw() {
     if (previewParticles.size() == 0)
@@ -38,11 +39,12 @@ void PlayerInput::Update(std::vector<std::shared_ptr<Particle>>& particles) {
 
     if (LeftMouseInputType != None) {
         if (Input::IsMouseClicked(0)) {
-            if (LeftMouseInputType == Impulse || LeftMouseInputType == Move) {
+            if (LeftMouseInputType == Impulse || LeftMouseInputType == Move ||
+                LeftMouseInputType == RemoveParticle) {
                 for (std::size_t i = 0; i < particles.size(); ++i) {
                     if (!particles[i]->IsMouseOverParticle(mousePosition))
                         continue;
-                    if (LeftMouseInputType == Impulse &&
+                    if ((LeftMouseInputType == Impulse) &&
                         !particles[i]->CanAddImpulseByMouse)
                         continue;
                     if (LeftMouseInputType == Move &&
@@ -76,21 +78,51 @@ void PlayerInput::Update(std::vector<std::shared_ptr<Particle>>& particles) {
                     particles.push_back(std::make_shared<Circle>(circle));
             } else if (LeftMouseInputType == DrawRect) {
                 previewParticles.clear();
-                glm::vec2 halfExtends = {0.0f, 0.0f};
-                halfExtends.x = glm::abs(originalPosition.x - mousePosition.x) / 2.0f;
-                halfExtends.y = glm::abs(originalPosition.y - mousePosition.y) / 2.0f;
-                glm::vec2 pos = (mousePosition + originalPosition) / 2.0f;
-                Rectangle rect = Rectangle(halfExtends, pos,
-                                           glm::vec2{0.0f, 0.0f}, 1.0f, 0.5f,
-                                           0.5f, 0.0f, 0.0f, 0.0f, false, false,
-                                           false, true, true, Colors::white);
-                if (halfExtends.x > 0.001f && halfExtends.y > 0.001f)
-                    particles.push_back(std::make_shared<Rectangle>(rect));
+                float length = glm::distance(mousePosition, originalPosition);
+                if (length > 0.1f) {
+                    glm::vec2 halfExtends = {0.0f, 0.0f};
+                    halfExtends.x =
+                        glm::abs(originalPosition.x - mousePosition.x) / 2.0f;
+                    halfExtends.y =
+                        glm::abs(originalPosition.y - mousePosition.y) / 2.0f;
+                    glm::vec2 pos = (mousePosition + originalPosition) / 2.0f;
+                    Rectangle rect =
+                        Rectangle(halfExtends, pos, glm::vec2{0.0f, 0.0f}, 1.0f,
+                                  0.5f, 0.5f, 0.0f, 0.0f, 0.0f, false, false,
+                                  false, true, true, Colors::white);
+                    if (halfExtends.x > 0.001f && halfExtends.y > 0.001f)
+                        particles.push_back(std::make_shared<Rectangle>(rect));
+                }
             } else if (LeftMouseInputType == DrawLine) {
                 previewParticles.clear();
                 float length = glm::distance(mousePosition, originalPosition);
-                if (length > 0.001f)
-                    particles.push_back(std::make_shared<Line>(mousePosition, originalPosition, false, false));
+                if (length > 0.1f) {
+                    Line line =
+                        Line(mousePosition, originalPosition, 0.0f, 0.0f, 1.0f,
+                             {0.0f, 0.0f}, {0.0f, 0.0f}, mousePosition, false,
+                             false, true, true, false, Colors::blue);
+                    particles.push_back(std::make_shared<Line>(line));
+                }
+            } else if (LeftMouseInputType == DrawAABB) {
+                previewParticles.clear();
+                float length = glm::distance(mousePosition, originalPosition);
+                if (length > 0.1f) {
+                    float minX = std::min(mousePosition.x, originalPosition.x);
+                    float minY = std::min(mousePosition.y, originalPosition.y);
+                    glm::vec2 bottomLeft(minX, minY);
+                    float maxX = std::max(mousePosition.x, originalPosition.x);
+                    float maxY = std::max(mousePosition.y, originalPosition.y);
+                    glm::vec2 topRight(maxX, maxY);
+                    AxisAlignedBox box = AxisAlignedBox(
+                        bottomLeft, topRight, {0.0f, 0.0f}, {0.0f, 0.0f}, 0.0f,
+                        0.0f, 0.0f, 1.0f, false, false, true, true, false,
+                        Colors::white);
+                    particles.push_back(std::make_shared<AxisAlignedBox>(box));
+                }
+            } else if (LeftMouseInputType == RemoveParticle) {
+                auto it = std::remove(particles.begin(), particles.end(),
+                                      selectedParticle);
+                particles.erase(it, particles.end());
             }
 
             if (selectedParticle != nullptr)
@@ -120,7 +152,7 @@ void PlayerInput::MouseDown(const InputType& inputType, std::shared_ptr<Particle
         circle.Colour = Colors::gray;
         previewParticles.push_back(
             std::make_shared<Circle>(circle));
-    } else if (inputType == DrawRect) {
+    } else if (inputType == DrawRect || inputType == DrawAABB) {
         previewParticles.clear();
         glm::vec2 halfExtends = {0.0f, 0.0f};
         halfExtends.x = glm::abs(originalPosition.x - mousePosition.x) / 2.0f;
@@ -146,7 +178,14 @@ void PlayerInput::MouseReleased(const InputType& inputType, std::shared_ptr<Part
     } else if (inputType == Impulse) {
         if (particle == nullptr)
             return;
-        particle->AddImpulse(mousePosition - originalPosition);
+        if (ApplyImpulsiveTorque) {
+            std::shared_ptr<RigidBody> rigidBody =
+                std::dynamic_pointer_cast<RigidBody>(particle);
+            rigidBody->AddImpulseWithTorque(mousePosition - originalPosition,
+                                            mousePosition);
+        } else {
+            particle->AddImpulse(mousePosition - originalPosition);
+        }
         previewParticles.clear();
     } 
 }
@@ -155,11 +194,17 @@ void PlayerInput::MouseClicked(const InputType& inputType, std::shared_ptr<Parti
     if (inputType == Impulse) {
         if (particle == nullptr)
             return;
-        if (particle->Type == Particle::Circle) {
-            originalPosition = std::dynamic_pointer_cast<Circle>(particle)->Position;
-        } else if (particle->Type == Particle::Rectangle) {
-            originalPosition =
-                std::dynamic_pointer_cast<Rectangle>(particle)->Position;
+        
+        if (ApplyImpulsiveTorque) {
+            originalPosition = mousePosition;
+        } else {
+            if (particle->Type == Particle::Circle) {
+                originalPosition =
+                    std::dynamic_pointer_cast<Circle>(particle)->Position;
+            } else if (particle->Type == Particle::Rectangle) {
+                originalPosition =
+                    std::dynamic_pointer_cast<Rectangle>(particle)->Position;
+            }
         }
     } else if (inputType == Move) {
     } else {

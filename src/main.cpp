@@ -8,6 +8,7 @@
 #include "scenes/Assignment7.h"
 #include "scenes/Assignment8.h"
 #include "scenes/Assignment9.h"
+#include "scenes/Assignment10.h"
 
 int main(int argc, char** argv) {
     // Add newly created scenes here so that they show up in the menu.
@@ -15,7 +16,7 @@ int main(int argc, char** argv) {
                                   new Assignment3(), new Assignment4(),
                                   new Assignment5(), new Assignment6(),
                                   new Assignment7(), new Assignment8(), 
-                                  new Assignment9()};
+                                  new Assignment9(), new Assignment10()};
     Application app(scenes);
     return app.Run();
 }

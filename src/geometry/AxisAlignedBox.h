@@ -21,7 +21,7 @@ public:
                    bool canAddImpulseByMouse = false,
                    Color color = Colors::white);
 
-    glm::vec2 TopRightOffset;
+    glm::vec2 TopRight;
 
     void Draw() override;
 

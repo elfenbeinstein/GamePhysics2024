@@ -22,8 +22,8 @@ public:
                        bool canAddImpulse);
 
     float GetInverseMass(float mass);
+    void AddForce(const glm::vec2& force);
     void AddImpulse(glm::vec2 impulse);
-    void Particle::AddForce(const glm::vec2& force);
 
     virtual void Draw() = 0;
     virtual void Update(float deltaTime, glm::vec2 gravity);

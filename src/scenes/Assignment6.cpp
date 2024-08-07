@@ -34,7 +34,7 @@ Assignment6::Assignment6()
       newBall(nullptr),
       playerLives(3),
       paddleImpulse(3.0f) {
-    playerInput = PlayerInput::PlayerInput(PlayerInput::Move);
+    playerInput = PlayerInput::PlayerInput(PlayerInput::Move, false);
     SetUpGame();
     world.SetCollisionCallback(std::bind(&Assignment6::OnCollision, this, std::placeholders::_1, std::placeholders::_2));
 }
@@ -54,24 +54,24 @@ void Assignment6::Update(float deltaTime) {
     // player paddle constraints
     if (playerPaddle->Position.x < left) {
         playerPaddle->Position.x = left;
-        playerPaddle->TopRightOffset.x = left + paddleWidth;
-    } else if (playerPaddle->TopRightOffset.x > right) {
-        playerPaddle->TopRightOffset.x = right;
+        playerPaddle->TopRight.x = left + paddleWidth;
+    } else if (playerPaddle->TopRight.x > right) {
+        playerPaddle->TopRight.x = right;
         playerPaddle->Position.x = right - paddleWidth;
     }
     if (playerPaddle->Position.y < paddleY) {
         playerPaddle->Position.y = paddleY;
-        playerPaddle->TopRightOffset.y = paddleY + paddleHeight;
+        playerPaddle->TopRight.y = paddleY + paddleHeight;
     } else if (playerPaddle->Position.y > paddleY) {
         playerPaddle->Position.y = paddleY;
-        playerPaddle->TopRightOffset.y = paddleY + paddleHeight;
+        playerPaddle->TopRight.y = paddleY + paddleHeight;
     }
 
     //move new ball with paddle
     if (newBall != nullptr) {
         newBall->Position =
             glm::vec2(playerPaddle->Position.x + paddleWidth / 2.0f,
-                      playerPaddle->TopRightOffset.y + ballRadius);
+                      playerPaddle->TopRight.y + ballRadius);
     }
 
     // release ball when space bar is pressed
@@ -247,7 +247,7 @@ void Assignment6::SetUpGame() {
 void Assignment6::AddNewBall() {
     newBall = std::make_shared<Circle>(
         glm::vec2(playerPaddle->Position.x + paddleWidth / 2.0f,
-                  playerPaddle->TopRightOffset.y + ballRadius),
+                  playerPaddle->TopRight.y + ballRadius),
        startVelocity, ballRadius, 1.0f, false, true, true, false, false);
 }
 

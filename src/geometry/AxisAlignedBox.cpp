@@ -4,7 +4,7 @@
 
 AxisAlignedBox::AxisAlignedBox()
     : Particle(Particle::AABB, Colors::white, 0.0f, 0.0f, 1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, true, false, true, false, false),
-      TopRightOffset(1.0f, 1.0f) {}
+      TopRight(1.0f, 1.0f) {}
 
 AxisAlignedBox::AxisAlignedBox(glm::vec2 bottomLeft,
                                glm::vec2 topRight,
@@ -33,11 +33,11 @@ AxisAlignedBox::AxisAlignedBox(glm::vec2 bottomLeft,
                canBeRemoved,
                canBeMovedByMouse,
                canAddImpulseByMouse),
-      TopRightOffset(topRight) {}
+      TopRight(topRight) {}
 
 void AxisAlignedBox::Draw() {
     Draw::SetColor(Colour);
-    Draw::AABB(Position, TopRightOffset);
+    Draw::AABB(Position, TopRight);
     Draw::SetColor(Colors::white);
 }
 
@@ -50,11 +50,11 @@ bool AxisAlignedBox::IsMouseOverParticle(glm::vec2 mousePosition) {
 
 void AxisAlignedBox::Move(glm::vec2 previousMousePosition, glm::vec2 currentMousePosition) {
     Position += currentMousePosition - previousMousePosition;
-    TopRightOffset += currentMousePosition - previousMousePosition;
+    TopRight += currentMousePosition - previousMousePosition;
 }
 
 glm::vec2 AxisAlignedBox::ClosestPoint(glm::vec2 otherPosition) {
-    float x = glm::clamp(otherPosition.x, Position.x, TopRightOffset.x);
-    float y = glm::clamp(otherPosition.y, Position.y, TopRightOffset.y);
+    float x = glm::clamp(otherPosition.x, Position.x, TopRight.x);
+    float y = glm::clamp(otherPosition.y, Position.y, TopRight.y);
     return {x, y};
 }

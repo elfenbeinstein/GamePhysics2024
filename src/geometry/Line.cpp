@@ -80,3 +80,34 @@ void Line::Draw() {
     Draw::Line(Position, EndOffset);
     Draw::SetColor(Colors::white);
 }
+
+bool Line::IsMouseOverParticle(glm::vec2 mousePosition) {
+    float projectedDistance =
+        glm::dot(mousePosition, Normal) - ProjectionOntoNormal;
+    if (glm::abs(projectedDistance) > 0.05f)
+        return false;
+    float distanceToStartSquared = std::pow(Position.x - mousePosition.x, 2) +
+                                   std::pow(Position.y - mousePosition.y, 2);
+    float distanceToEndSquared = std::pow(EndOffset.x - mousePosition.x, 2) +
+                                 std::pow(EndOffset.y - mousePosition.y, 2);
+
+    float distanceClosestPointFromStart = glm::sqrt(
+        distanceToStartSquared + glm::pow(glm::abs(projectedDistance), 2));
+    float distanceClosestPointFromEnd = glm::sqrt(
+        distanceToEndSquared + glm::pow(glm::abs(projectedDistance), 2));
+
+    float lineLength = glm::distance(Position, EndOffset);
+
+    if (distanceClosestPointFromStart > lineLength ||
+        distanceClosestPointFromEnd > lineLength)
+        return false;
+
+    return true;
+}
+
+void Line::Move(glm::vec2 previousMousePosition,
+                          glm::vec2 currentMousePosition) {
+    Position += currentMousePosition - previousMousePosition;
+    EndOffset += currentMousePosition - previousMousePosition;
+    CalculateNormal();
+}

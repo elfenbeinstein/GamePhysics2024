@@ -4,7 +4,20 @@
 #include "core/Draw.h"
 
 Circle::Circle()
-    : RigidBody(Particle::Circle, Colors::white, 1.0f, 0.0f, 1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, false, false, true, false, false),
+    : RigidBody(Particle::Circle,
+                Colors::white,
+                1.0f,
+                0.0f,
+                1.0f,
+                PhysicsUtils::GetMomentOfInertiaCircle(0.5f, 1.0f),
+                {0.0f, 0.0f},
+                {0.0f, 0.0f},
+                {0.0f, 0.0f},
+                false,
+                false,
+                true,
+                false,
+                false),
       Acceleration(0, 0),
       Radius(0.5f) {}
 
@@ -23,7 +36,23 @@ Circle::Circle(glm::vec2 pos,
                float angle,
                float angularDamp,
                float angularVel)
-    : RigidBody(Particle::Circle, colour, mass, damping, coefficientOfRestitution, angle, angularVel, angularDamp, vel, {0.0f, 0.0f}, pos, removeAfterCollision, removeOtherAfterCollision, canBeRemoved, canBeMovedByMouse, canAddImpulseByMouse),
+    : RigidBody(Particle::Circle,
+                colour,
+                mass,
+                damping,
+                coefficientOfRestitution,
+                angle,
+                angularVel,
+                angularDamp,
+                PhysicsUtils::GetMomentOfInertiaCircle(rad, mass),
+                vel,
+                {0.0f, 0.0f},
+                pos,
+                removeAfterCollision,
+                removeOtherAfterCollision,
+                canBeRemoved,
+                canBeMovedByMouse,
+                canAddImpulseByMouse),
       Acceleration(0, 0),
       Radius(rad) {}
 
