@@ -3,8 +3,8 @@
 #include "imgui.h"
 #include <vector>
 #include "core/Simple2DScene.h"
-#include "geometry/Circle.h"
-#include "geometry/Line.h"
+#include "physics/Circle.h"
+#include "physics/Line.h"
 #include "core/Draw.h"
 
 Assignment3::Assignment3()
@@ -40,7 +40,7 @@ void Assignment3::Draw() {
     }
 
     for (const auto& line : lines) {
-        Draw::Line(line.Position, line.EndOffset);
+        Draw::Line(line.Position, line.End);
     }
 }
 
@@ -99,8 +99,8 @@ void Assignment3::CheckForCollisionWithinEndpoints(Circle& circle) {
         }
 
         float distanceToEndSquared =
-            std::pow(line.EndOffset.x - circle.Position.x, 2) +
-            std::pow(line.EndOffset.y - circle.Position.y, 2);
+            std::pow(line.End.x - circle.Position.x, 2) +
+            std::pow(line.End.y - circle.Position.y, 2);
         if (distanceToEndSquared <= radiusSquared) {
             intersectionDepth = std::sqrt(radiusSquared - distanceToEndSquared);
             ResolveCollision(circle, line, intersectionDepth);
@@ -119,7 +119,7 @@ void Assignment3::CheckForCollisionWithinEndpoints(Circle& circle) {
         float distanceClosestPointFromEnd =
             glm::sqrt(distanceToEndSquared + glm::pow(projectedDistance, 2));
 
-        float lineLength = glm::distance(line.Position, line.EndOffset);
+        float lineLength = glm::distance(line.Position, line.End);
 
         if (distanceClosestPointFromStart > lineLength ||
             distanceClosestPointFromEnd > lineLength)

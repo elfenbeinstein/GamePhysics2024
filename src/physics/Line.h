@@ -1,6 +1,6 @@
 #pragma once
 #include "core/Simple2DScene.h"
-#include "geometry/Particle.h"
+#include "physics/Particle.h"
 
 class Line : public Particle {
 public:
@@ -24,7 +24,7 @@ public:
                bool canAddImpulse = false,
                Color color = Colors::blue);
 
-    glm::vec2 EndOffset;
+    glm::vec2 End;
     glm::vec2 Direction;
     glm::vec2 Normal;
     float ProjectionOntoNormal;

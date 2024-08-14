@@ -3,7 +3,7 @@
 #include "imgui.h"
 
 Assignment7::Assignment7()
-    : world(World(glm::vec2(), true, true)),
+    : world(World(glm::vec2(), true, true, false)),
       inputType(PlayerInput::Impulse),
       randomGenerator(RandomParticleGenerator()),
       particles() {

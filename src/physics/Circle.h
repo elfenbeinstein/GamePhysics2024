@@ -1,7 +1,7 @@
 #pragma once
 #include "core/Simple2DScene.h"
-#include "geometry/Particle.h"
-#include "geometry/RigidBody.h"
+#include "physics/Particle.h"
+#include "physics/RigidBody.h"
 
 class Circle : public RigidBody {
 public:

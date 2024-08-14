@@ -72,7 +72,7 @@ void Assignment4::Draw() {
     Draw::SetColor(Colors::white);
 
     for (const auto& line : lines) {
-        Draw::Line(line.Position, line.EndOffset);
+        Draw::Line(line.Position, line.End);
     }
 }
 
@@ -144,8 +144,8 @@ void Assignment4::CheckForCollisionWithLines(Circle& circle) {
         }
 
         float distanceToEndSquared =
-            std::pow(line.EndOffset.x - circle.Position.x, 2) +
-            std::pow(line.EndOffset.y - circle.Position.y, 2);
+            std::pow(line.End.x - circle.Position.x, 2) +
+            std::pow(line.End.y - circle.Position.y, 2);
         if (distanceToEndSquared <= radiusSquared) {
             intersectionDepth = std::sqrt(radiusSquared - distanceToEndSquared);
             ResolveCollision(circle, line, intersectionDepth);
@@ -163,7 +163,7 @@ void Assignment4::CheckForCollisionWithLines(Circle& circle) {
         float distanceClosestPointFromEnd =
             glm::sqrt(distanceToEndSquared + glm::pow(projectedDistance, 2));
 
-        float lineLength = glm::distance(line.Position, line.EndOffset);
+        float lineLength = glm::distance(line.Position, line.End);
 
         if (distanceClosestPointFromStart > lineLength ||
             distanceClosestPointFromEnd > lineLength)

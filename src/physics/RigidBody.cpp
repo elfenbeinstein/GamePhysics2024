@@ -1,4 +1,4 @@
-#include "geometry/RigidBody.h"
+#include "physics/RigidBody.h"
 
 RigidBody::RigidBody(ParticleType type,
                      Color color,

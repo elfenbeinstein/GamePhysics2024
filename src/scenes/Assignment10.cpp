@@ -4,7 +4,7 @@
 
 Assignment10::Assignment10()
     : playerInput(PlayerInput::InputType::None, true),
-      world(glm::vec2{0.0f, 0.0f}, true, true),
+      world(glm::vec2{0.0f, 0.0f}, true, true, false),
       particles(),
       useGravity(false),
       damping(0.5f),

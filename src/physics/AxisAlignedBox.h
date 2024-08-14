@@ -1,6 +1,6 @@
 #pragma once
 #include "core/Simple2DScene.h"
-#include "geometry/Particle.h"
+#include "physics/Particle.h"
 #include "core/Colors.h"
 
 class AxisAlignedBox : public Particle {

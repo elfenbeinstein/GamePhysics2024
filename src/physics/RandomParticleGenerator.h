@@ -1,8 +1,8 @@
 #pragma once
 
-#include "geometry/Circle.h"
-#include "geometry/Line.h"
-#include "geometry/AxisAlignedBox.h"
+#include "physics/Circle.h"
+#include "physics/Line.h"
+#include "physics/AxisAlignedBox.h"
 #include <memory>
 #include <vector>
 #include <functional>

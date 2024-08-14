@@ -1,11 +1,11 @@
 #pragma once
 #include "core/Simple2DScene.h"
 #include <vector>
-#include "geometry/Particle.h"
-#include "geometry/Circle.h"
-#include "geometry/Rectangle.h"
-#include "geometry/Line.h"
-#include "geometry/AxisAlignedBox.h"
+#include "physics/Particle.h"
+#include "physics/Circle.h"
+#include "physics/Rectangle.h"
+#include "physics/Line.h"
+#include "physics/AxisAlignedBox.h"
 #include <memory>
 
 class PlayerInput {

@@ -4,7 +4,7 @@
 
 Line::Line()
     : Particle(Particle::Line, Colors::blue, 0.0f, 0.0f, 1.0f, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, false, false, false, false, false),
-      EndOffset(10.0f, 0.0f),
+      End(10.0f, 0.0f),
       Normal(),
       Direction(),
       ProjectionOntoNormal(0.0f) {
@@ -28,7 +28,7 @@ Line::Line(glm::vec2 start,
                canBeRemoved,
                false,
                false),
-      EndOffset(end),
+      End(end),
       Normal(),
       Direction(),
       ProjectionOntoNormal(0.0f) {
@@ -62,7 +62,7 @@ Line::Line(glm::vec2 start,
                canBeRemoved,
                canBeMoved,
                canAddImpulse),
-      EndOffset(end),
+      End(end),
       Normal(),
       Direction(),
       ProjectionOntoNormal(0.0f) {
@@ -70,14 +70,14 @@ Line::Line(glm::vec2 start,
 }
 
 void Line::CalculateNormal() {
-    Direction = EndOffset - Position;
+    Direction = End - Position;
     Normal = glm::normalize(glm::vec2{-Direction.y, Direction.x});
     ProjectionOntoNormal = glm::dot(Position, Normal);
 }
 
 void Line::Draw() {
     Draw::SetColor(Colour);
-    Draw::Line(Position, EndOffset);
+    Draw::Line(Position, End);
     Draw::SetColor(Colors::white);
 }
 
@@ -88,15 +88,15 @@ bool Line::IsMouseOverParticle(glm::vec2 mousePosition) {
         return false;
     float distanceToStartSquared = std::pow(Position.x - mousePosition.x, 2) +
                                    std::pow(Position.y - mousePosition.y, 2);
-    float distanceToEndSquared = std::pow(EndOffset.x - mousePosition.x, 2) +
-                                 std::pow(EndOffset.y - mousePosition.y, 2);
+    float distanceToEndSquared = std::pow(End.x - mousePosition.x, 2) +
+                                 std::pow(End.y - mousePosition.y, 2);
 
     float distanceClosestPointFromStart = glm::sqrt(
         distanceToStartSquared + glm::pow(glm::abs(projectedDistance), 2));
     float distanceClosestPointFromEnd = glm::sqrt(
         distanceToEndSquared + glm::pow(glm::abs(projectedDistance), 2));
 
-    float lineLength = glm::distance(Position, EndOffset);
+    float lineLength = glm::distance(Position, End);
 
     if (distanceClosestPointFromStart > lineLength ||
         distanceClosestPointFromEnd > lineLength)
@@ -108,6 +108,6 @@ bool Line::IsMouseOverParticle(glm::vec2 mousePosition) {
 void Line::Move(glm::vec2 previousMousePosition,
                           glm::vec2 currentMousePosition) {
     Position += currentMousePosition - previousMousePosition;
-    EndOffset += currentMousePosition - previousMousePosition;
+    End += currentMousePosition - previousMousePosition;
     CalculateNormal();
 }

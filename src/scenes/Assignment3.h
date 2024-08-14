@@ -2,8 +2,8 @@
 
 #include <vector>
 #include "core/Simple2DScene.h"
-#include "geometry/Circle.h"
-#include "geometry/Line.h"
+#include "physics/Circle.h"
+#include "physics/Line.h"
 
 class Assignment3 : public Simple2DScene {
 public:

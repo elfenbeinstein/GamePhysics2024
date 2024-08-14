@@ -2,11 +2,11 @@
 
 #include <vector>
 #include "core/Simple2DScene.h"
-#include "geometry/Line.h"
-#include "geometry/Particle.h"
-#include "geometry/World.h"
-#include "geometry/PlayerInput.h"
-#include "geometry/RandomParticleGenerator.h"
+#include "physics/Line.h"
+#include "physics/Particle.h"
+#include "physics/World.h"
+#include "physics/PlayerInput.h"
+#include "physics/RandomParticleGenerator.h"
 #include <memory>
 
 class Assignment7 : public Simple2DScene {

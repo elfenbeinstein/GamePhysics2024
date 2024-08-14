@@ -1,8 +1,8 @@
 #pragma once
 #include "core/Simple2DScene.h"
 #include "core/Math.h"
-#include "geometry/Particle.h"
-#include "geometry/RigidBody.h"
+#include "physics/Particle.h"
+#include "physics/RigidBody.h"
 
 class Rectangle : public RigidBody {
 public:

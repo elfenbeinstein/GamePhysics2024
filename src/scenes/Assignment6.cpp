@@ -2,7 +2,7 @@
 
 #include "imgui.h"
 #include "core/Draw.h"
-#include "geometry/Circle.h"
+#include "physics/Circle.h"
 #include "core/Colors.h"
 #include <string>
 
@@ -76,7 +76,10 @@ void Assignment6::Update(float deltaTime) {
 
     // release ball when space bar is pressed
     if (ImGui::IsKeyPressed(ImGuiKey_Space) && newBall != nullptr) {
-        particles.push_back(std::make_shared<Circle>(newBall->Position, newBall->Velocity, newBall->Radius, newBall->Mass, false, true, true, false, false));
+        particles.push_back(std::make_shared<Circle>(
+            newBall->Position, newBall->Velocity, newBall->Radius,
+            newBall->Mass, 0.0f, 1.0f, false, true, true, false, false,
+            Colors::white, 0.0f, 0.0f, 0.0f));
         newBall = nullptr;
     }
 
@@ -237,6 +240,11 @@ void Assignment6::SetUpGame() {
         glm::vec2(1.75f, 1.25f), glm::vec2(2.75f, 1.5f), glm::vec2{0.0f, 0.0f},
         glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, true, false, true, false,
         false));
+
+    playerPaddle = std::make_shared<AxisAlignedBox>(
+        glm::vec2(-0.5f, -4.75f), glm::vec2(0.5f, -4.5f), glm::vec2{0.0f, 0.0f},
+        glm::vec2{0.0f, 0.0f}, 1.0f, 1.0f, 0.0f, 1.0f, false, false, false,
+        true, false, Colors::white);
 
     particles.push_back(playerPaddle);
     playerLives = 3;

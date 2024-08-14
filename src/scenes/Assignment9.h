@@ -2,10 +2,10 @@
 
 #include <vector>
 #include "core/Simple2DScene.h"
-#include "geometry/Particle.h"
-#include "geometry/World.h"
-#include "geometry/PlayerInput.h"
-#include "geometry/RigidBody.h"
+#include "physics/Particle.h"
+#include "physics/World.h"
+#include "physics/PlayerInput.h"
+#include "physics/RigidBody.h"
 
 class Assignment9 : public Simple2DScene {
 public:

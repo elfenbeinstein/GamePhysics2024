@@ -4,7 +4,7 @@
 #include "core/Draw.h"
 
 Assignment8::Assignment8()
-    : world(World(glm::vec2(), true, true)),
+    : world(World(glm::vec2(), true, true, false)),
       inputType(PlayerInput::Impulse),
       ballsCollected(0),
       winCount(0),

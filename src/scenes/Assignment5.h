@@ -2,8 +2,8 @@
 
 #include <vector>
 #include "core/Simple2DScene.h"
-#include "geometry/Circle.h"
-#include "geometry/AxisAlignedBox.h"
+#include "physics/Circle.h"
+#include "physics/AxisAlignedBox.h"
 
 class Assignment5 : public Simple2DScene {
 public:

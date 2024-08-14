@@ -1,7 +1,7 @@
 #pragma once
 #include "core/Simple2DScene.h"
 #include "core/PhysicsUtils.h"
-#include "geometry/Particle.h"
+#include "physics/Particle.h"
 
 class RigidBody : public Particle {
 public:

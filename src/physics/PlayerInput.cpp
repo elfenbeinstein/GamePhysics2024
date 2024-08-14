@@ -9,7 +9,8 @@ PlayerInput::PlayerInput()
       PreviewTime(1.0f),
       PreviewSteps(4),
       selectedParticle(nullptr),
-      originalColour() {}
+      originalColour(),
+      ApplyImpulsiveTorque(false) {}
 
 PlayerInput::PlayerInput(InputType leftMouseInput, bool applyImpulsiveTorque)
     : LeftMouseInputType(leftMouseInput),

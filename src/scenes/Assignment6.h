@@ -2,12 +2,12 @@
 
 #include <vector>
 #include "core/Simple2DScene.h"
-#include "geometry/Circle.h"
-#include "geometry/AxisAlignedBox.h"
-#include "geometry/Line.h"
-#include "geometry/Particle.h"
-#include "geometry/World.h"
-#include "geometry/PlayerInput.h"
+#include "physics/Circle.h"
+#include "physics/AxisAlignedBox.h"
+#include "physics/Line.h"
+#include "physics/Particle.h"
+#include "physics/World.h"
+#include "physics/PlayerInput.h"
 #include <memory>
 
 class Assignment6 : public Simple2DScene {

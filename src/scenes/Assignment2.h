@@ -2,7 +2,7 @@
 
 #include <vector>
 #include "core/Simple2DScene.h"
-#include "geometry/Circle.h"
+#include "physics/Circle.h"
 
 class Assignment2 : public Simple2DScene {
 public:
