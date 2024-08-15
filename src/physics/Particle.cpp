@@ -58,9 +58,21 @@ void Particle::AddImpulse(glm::vec2 impulse) {
      Velocity += impulse * InverseMass;
  }
 
+void Particle::AddImpulseWithTorque(glm::vec2 impulse, glm::vec2 pointOfApplication) {
+     Velocity += impulse * InverseMass;
+ }
+
 void Particle::AddForce(const glm::vec2& force) {
      TotalForce += force;
  }
+
+float Particle::GetInverseMomentOfInertia() {
+     return 1.0f;
+ }
+
+float Particle::GetAngularVelocity() {
+    return 0.0f;
+}
 
  void Particle::Update(float deltaTime, glm::vec2 gravity) {}
  

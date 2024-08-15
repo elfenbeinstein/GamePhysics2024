@@ -105,7 +105,7 @@ void RigidBody::Move(glm::vec2 previousMousePosition,
 
 void RigidBody::AddImpulseWithTorque(glm::vec2 impulse,
                                      glm::vec2 pointOfApplication) {
-    Particle::AddImpulse(impulse);
+    Velocity += impulse * InverseMass;
     glm::vec2 r = pointOfApplication - Position;
     float impulsiveTorque = Math::CrossProduct2D(r, impulse);
     AngularVelocity += impulsiveTorque * InverseMomentOfInertia;
@@ -113,4 +113,11 @@ void RigidBody::AddImpulseWithTorque(glm::vec2 impulse,
 
 void RigidBody::AddTorque(float torque) {
     TotalTorque += torque;
+}
+
+float RigidBody::GetInverseMomentOfInertia() {
+    return InverseMomentOfInertia;
+}
+float RigidBody::GetAngularVelocity() {
+    return AngularVelocity;
 }

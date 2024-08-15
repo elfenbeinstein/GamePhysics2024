@@ -58,3 +58,17 @@ glm::vec2 AxisAlignedBox::ClosestPoint(glm::vec2 otherPosition) {
     float y = glm::clamp(otherPosition.y, Position.y, TopRight.y);
     return {x, y};
 }
+
+float AxisAlignedBox::GetInverseMomentOfInertia() {
+    if (Mass == 0.0f)
+        return 0.0f;
+
+    glm::vec2 halfExtends = {0.0f, 0.0f};
+    halfExtends.x = (TopRight.x - Position.x) / 2.0f;
+    halfExtends.y = (TopRight.y - Position.y) / 2.0f;
+    float moi = PhysicsUtils::GetMomentOfInertiaRect(halfExtends, Mass);
+
+    if (moi == 0.0f)
+        return 0.0f;
+    return 1.0f / moi;
+}

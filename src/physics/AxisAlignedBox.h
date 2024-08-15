@@ -1,5 +1,6 @@
 #pragma once
 #include "core/Simple2DScene.h"
+#include "core/PhysicsUtils.h"
 #include "physics/Particle.h"
 #include "core/Colors.h"
 
@@ -29,4 +30,5 @@ public:
     void Move(glm::vec2 previousMousePosition, glm::vec2 currentMousePosition) override;
 
     glm::vec2 ClosestPoint(glm::vec2 otherPosition);
+    float GetInverseMomentOfInertia() override;
 };

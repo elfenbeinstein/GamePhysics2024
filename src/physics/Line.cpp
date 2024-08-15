@@ -111,3 +111,7 @@ void Line::Move(glm::vec2 previousMousePosition,
     End += currentMousePosition - previousMousePosition;
     CalculateNormal();
 }
+
+float Line::GetInverseMomentOfInertia() {
+    return 0.0f;
+}

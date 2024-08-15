@@ -165,6 +165,9 @@ bool World::IsColliding(std::shared_ptr<Circle> circle, std::shared_ptr<Line> li
         collisionManifold.IntersectionDepth = std::sqrt(radiusSquared - distanceToStartSquared);
         collisionManifold.ContactPoint1 = line->Position;
         collisionManifold.ContactPointCount = 1;
+        float projection = glm::dot(circle->Position, collisionManifold.CollisionNormal) - line->ProjectionOntoNormal;
+        if (projection < 0)
+            collisionManifold.CollisionNormal = -collisionManifold.CollisionNormal;
         return true;
     }
 
@@ -174,6 +177,9 @@ bool World::IsColliding(std::shared_ptr<Circle> circle, std::shared_ptr<Line> li
         collisionManifold.IntersectionDepth = std::sqrt(radiusSquared - distanceToEndSquared);
         collisionManifold.ContactPoint1 = line->End;
         collisionManifold.ContactPointCount = 1;
+        float projection = glm::dot(circle->Position, collisionManifold.CollisionNormal) - line->ProjectionOntoNormal;
+        if (projection < 0)
+            collisionManifold.CollisionNormal = -collisionManifold.CollisionNormal;
         return true;
     }
 
@@ -356,27 +362,7 @@ void World::ResolveCollision(std::shared_ptr<Particle> particle1, std::shared_pt
     }
 
     if (ResolveCollisionsWithImpulsiveTorque && collisionManifold.ContactPointCount > 0) {
-        std::shared_ptr<RigidBody> rigidBody1 = nullptr;
-        std::shared_ptr<RigidBody> rigidBody2 = nullptr;
-
-        if (particle1->Type == Particle::Circle ||
-            particle1->Type == Particle::Rectangle) {
-            rigidBody1 = std::dynamic_pointer_cast<RigidBody>(particle1);
-        }
-
-        if (particle2->Type == Particle::Circle ||
-            particle2->Type == Particle::Rectangle) {
-            rigidBody2 = std::dynamic_pointer_cast<RigidBody>(particle2);
-        }
-
-        if (rigidBody1 != nullptr && rigidBody2 != nullptr) {
-            ResolveCollisionWithImpulsiveTorque(rigidBody1, rigidBody2, collisionManifold);
-        } else if (rigidBody1 != nullptr) {
-            ResolveCollisionWithImpulsiveTorque(rigidBody1, particle2, collisionManifold);
-        } else if (rigidBody2 != nullptr) {
-            //collisionManifold.CollisionNormal = -collisionManifold.CollisionNormal;
-            ResolveCollisionWithImpulsiveTorque(rigidBody2, particle1, collisionManifold);
-        }
+        ResolveCollisionWithImpulsiveTorque(particle1, particle2, collisionManifold);
     } else if (ResolveCollisionsInelastic) {
         float coefficient = particle1->CoefficientOfRestitution;
         if (particle2->CoefficientOfRestitution < coefficient)
@@ -395,92 +381,105 @@ void World::ResolveCollision(std::shared_ptr<Particle> particle1, std::shared_pt
     }
 }
 
-void World::ResolveCollisionWithImpulsiveTorque(std::shared_ptr<RigidBody> rigidBodyA, std::shared_ptr<RigidBody> rigidBodyB, CollisionManifold& collisionManifold) {
-    float coefficient = rigidBodyA->CoefficientOfRestitution;
-    if (rigidBodyB->CoefficientOfRestitution < coefficient)
-        coefficient = rigidBodyB->CoefficientOfRestitution;
+void World::ResolveCollisionWithImpulsiveTorque(std::shared_ptr<Particle> particleA,
+                                         std::shared_ptr<Particle> particleB,
+                                         CollisionManifold& collisionManifold) {
+    float coefficient = particleA->CoefficientOfRestitution;
+    if (particleB->CoefficientOfRestitution < coefficient)
+        coefficient = particleB->CoefficientOfRestitution;
+    float impulseMagnitude = (-(1.0f + coefficient) *
+         glm::dot((particleB->Velocity - particleA->Velocity), collisionManifold.CollisionNormal)) /
+        (particleA->InverseMass + particleB->InverseMass);
     
-    // contact point 1
-    glm::vec2 rA = collisionManifold.ContactPoint1 - rigidBodyA->Position;
-    glm::vec2 totalVelocityA = rigidBodyA->Velocity + rigidBodyA->AngularVelocity * glm::vec2{-rA.y, rA.x};
-    glm::vec2 rB = collisionManifold.ContactPoint1 - rigidBodyB->Position;
-    glm::vec2 totalVelocityB = rigidBodyB->Velocity + rigidBodyB->AngularVelocity * glm::vec2{-rB.y, rB.x};
+    if ((particleA->Type == Particle::Circle && particleB->Type == Particle::Line) || 
+        (particleA->Type == Particle::Line && particleB->Type == Particle::Circle) ||
+        (collisionManifold.ContactPointCount == 2 && 
+            (particleA->Type == Particle::Rectangle && (particleB->Type == Particle::Line || particleB->Type == Particle::AABB)) ||
+            ((particleA->Type == Particle::Line || particleA->Type == Particle::AABB) && particleB->Type == Particle::Rectangle))) {
+        particleA->AddImpulse(impulseMagnitude *
+                              -collisionManifold.CollisionNormal);
+        particleB->AddImpulse(impulseMagnitude *
+                              collisionManifold.CollisionNormal);
+        return;
+    }
 
-    float numerator = (-(1.0f + coefficient) * 
-        glm::dot((totalVelocityB - totalVelocityA), collisionManifold.CollisionNormal));
-    float denominator =
-        (rigidBodyA->InverseMass + rigidBodyB->InverseMass) + 
-        (glm::pow(glm::dot(rA, collisionManifold.CollisionNormal), 2) * rigidBodyA->InverseMomentOfInertia) + 
-        (glm::pow(glm::dot(rB, collisionManifold.CollisionNormal), 2) * rigidBodyB->InverseMomentOfInertia);
-    float impulseMagnitude1 = (numerator / denominator) / collisionManifold.ContactPointCount;
+    // contact point 1
+    glm::vec2 rA = collisionManifold.ContactPoint1 - particleA->Position;
+    glm::vec2 totalVelocityA =
+        particleA->Velocity +
+        particleA->GetAngularVelocity() * glm::vec2{-rA.y, rA.x};
+    glm::vec2 rB = collisionManifold.ContactPoint1 - particleB->Position;
+    glm::vec2 totalVelocityB =
+        particleB->Velocity +
+        particleB->GetAngularVelocity() * glm::vec2{-rB.y, rB.x};
+    glm::vec2 relativeVelocity = totalVelocityB - totalVelocityA;
+    float separatingVelocity =
+        glm::dot(relativeVelocity, collisionManifold.CollisionNormal);
+
+    float impulseMagnitude1;
+    bool applyImpulsePoint1 = true;
+    if (separatingVelocity > 0) {
+        applyImpulsePoint1 = false;
+    } else {
+        impulseMagnitude1 = GetImpulseMagnitude(
+            rA, rB, coefficient, separatingVelocity, particleA->InverseMass,
+            particleB->InverseMass, particleA->GetInverseMomentOfInertia(),
+            particleB->GetInverseMomentOfInertia(), collisionManifold);
+    }
 
     // contact point 2
     if (collisionManifold.ContactPointCount > 1) {
-        rA = collisionManifold.ContactPoint2 - rigidBodyA->Position;
-        totalVelocityA = rigidBodyA->Velocity + rigidBodyA->AngularVelocity * glm::vec2{-rA.y, rA.x};
-        rB = collisionManifold.ContactPoint2 - rigidBodyB->Position;
-        totalVelocityB = rigidBodyB->Velocity + rigidBodyB->AngularVelocity * glm::vec2{-rB.y, rB.x};
-        numerator = (-(1.0f + coefficient) * glm::dot((totalVelocityB - totalVelocityA), collisionManifold.CollisionNormal));
-        denominator =
-            (rigidBodyA->InverseMass + rigidBodyB->InverseMass) +
-            (glm::pow(glm::dot(rA, collisionManifold.CollisionNormal), 2) * rigidBodyA->InverseMomentOfInertia) +
-            (glm::pow(glm::dot(rB, collisionManifold.CollisionNormal), 2) * rigidBodyB->InverseMomentOfInertia);
-        float impulseMagnitude2 = (numerator / denominator) / collisionManifold.ContactPointCount;
-         
-        rigidBodyA->AddImpulseWithTorque(impulseMagnitude2 * -collisionManifold.CollisionNormal, collisionManifold.ContactPoint2);
-        rigidBodyB->AddImpulseWithTorque(impulseMagnitude2 * collisionManifold.CollisionNormal, collisionManifold.ContactPoint2);
+        rA = collisionManifold.ContactPoint2 - particleA->Position;
+        totalVelocityA = particleA->Velocity + particleA->GetAngularVelocity() *
+                                                   glm::vec2{-rA.y, rA.x};
+        rB = collisionManifold.ContactPoint2 - particleB->Position;
+        totalVelocityB = particleB->Velocity + particleB->GetAngularVelocity() *
+                                                   glm::vec2{-rB.y, rB.x};
+        relativeVelocity = totalVelocityB - totalVelocityA;
+        separatingVelocity =
+            glm::dot(relativeVelocity, collisionManifold.CollisionNormal);
+
+        if (separatingVelocity <= 0) {
+            float impulseMagnitude2 = GetImpulseMagnitude(
+                rA, rB, coefficient, separatingVelocity, particleA->InverseMass,
+                particleB->InverseMass, particleA->GetInverseMomentOfInertia(),
+                particleB->GetInverseMomentOfInertia(), collisionManifold);
+
+            particleA->AddImpulseWithTorque(
+                impulseMagnitude2 * -collisionManifold.CollisionNormal,
+                collisionManifold.ContactPoint2);
+            particleB->AddImpulseWithTorque(
+                impulseMagnitude2 * collisionManifold.CollisionNormal,
+                collisionManifold.ContactPoint2);
+        }
     }
 
-    rigidBodyA->AddImpulseWithTorque(impulseMagnitude1 * -collisionManifold.CollisionNormal, collisionManifold.ContactPoint1);
-    rigidBodyB->AddImpulseWithTorque(impulseMagnitude1 * collisionManifold.CollisionNormal, collisionManifold.ContactPoint1);
+    if (!applyImpulsePoint1)
+        return;
+
+    particleA->AddImpulseWithTorque(
+        impulseMagnitude1 * -collisionManifold.CollisionNormal,
+        collisionManifold.ContactPoint1);
+    particleB->AddImpulseWithTorque(
+        impulseMagnitude1 * collisionManifold.CollisionNormal,
+        collisionManifold.ContactPoint1);
 }
 
-void World::ResolveCollisionWithImpulsiveTorque(std::shared_ptr<RigidBody> rigidBody, std::shared_ptr<Particle> particle, CollisionManifold& collisionManifold) {
-    return;
-    float coefficient = rigidBody->CoefficientOfRestitution;
-    if (particle->CoefficientOfRestitution < coefficient)
-        coefficient = particle->CoefficientOfRestitution;
+float World::GetImpulseMagnitude(const glm::vec2& rA,
+                                 const glm::vec2& rB,
+                                 const float& coefficientOfRestitution,
+                                 const float& separatingVelocity,
+                                 const float& inverseMassA,
+                                 const float& inverseMassB,
+                                 const float& inverseMomentOfInertiaA,
+                                 const float& inverseMomentOfInertiaB,
+                                 CollisionManifold& collisionManifold) {
+    float perpendicularProductA = Math::CrossProduct2D(rA, collisionManifold.CollisionNormal);
+    float perpendicularProductB = Math::CrossProduct2D(rB, collisionManifold.CollisionNormal);
 
-    // contact point 1
-    glm::vec2 rA = collisionManifold.ContactPoint1 - rigidBody->Position;
-    glm::vec2 totalVelocityA = rigidBody->Velocity + rigidBody->AngularVelocity * glm::vec2{-rA.y, rA.x};
-    glm::vec2 rB = collisionManifold.ContactPoint1 - particle->Position;
-    glm::vec2 totalVelocityB = particle->Velocity;
-
-    float numerator = (-(1.0f + coefficient) * 
-        glm::dot((totalVelocityB - totalVelocityA), collisionManifold.CollisionNormal));
-    float denominator =
-        (rigidBody->InverseMass + particle->InverseMass) + 
-        (glm::pow(glm::dot(rA, collisionManifold.CollisionNormal), 2) * rigidBody->InverseMomentOfInertia) + 
-        (glm::pow(glm::dot(rB, collisionManifold.CollisionNormal), 2));
-    float impulseMagnitude1 = (numerator / denominator) / collisionManifold.ContactPointCount;
-
-    // contact point 2
-    if (collisionManifold.ContactPointCount > 1) {
-        rA = collisionManifold.ContactPoint2 - rigidBody->Position;
-        totalVelocityA = rigidBody->Velocity + rigidBody->AngularVelocity * glm::vec2{-rA.y, rA.x};
-        rB = collisionManifold.ContactPoint2 - particle->Position;
-        totalVelocityB = particle->Velocity;
-        numerator = (-(1.0f + coefficient) * glm::dot((totalVelocityB - totalVelocityA), collisionManifold.CollisionNormal));
-        denominator =
-            (rigidBody->InverseMass + particle->InverseMass) +
-            (glm::pow(glm::dot(rA, collisionManifold.CollisionNormal), 2) * rigidBody->InverseMomentOfInertia) +
-            (glm::pow(glm::dot(rB, collisionManifold.CollisionNormal), 2));
-        float impulseMagnitude2 = (numerator / denominator) / collisionManifold.ContactPointCount;
-
-        rigidBody->AddImpulseWithTorque(impulseMagnitude2 * -collisionManifold.CollisionNormal, collisionManifold.ContactPoint2);
-        particle->AddImpulse(impulseMagnitude2 * collisionManifold.CollisionNormal);
-    }
-
-    float impulseMagnitude =
-            (-(1.0f + coefficient) * glm::dot((particle->Velocity - rigidBody->Velocity),
-                      collisionManifold.CollisionNormal)) /
-            (rigidBody->InverseMass + particle->InverseMass);
-
-    /*rigidBody->AddImpulseWithTorque(impulseMagnitude1 * -collisionManifold.CollisionNormal, collisionManifold.ContactPoint1);
-    particle->AddImpulse(impulseMagnitude1 * collisionManifold.CollisionNormal);*/
-
-    rigidBody->AddImpulse(impulseMagnitude * -collisionManifold.CollisionNormal);
-    particle->AddImpulse(impulseMagnitude * collisionManifold.CollisionNormal);
-
+    float numerator = -(1.0f + coefficientOfRestitution) * separatingVelocity;
+    float denominator = (inverseMassA + inverseMassB) +
+        ((perpendicularProductA * perpendicularProductA) * inverseMomentOfInertiaA) +
+        ((perpendicularProductB * perpendicularProductB) * inverseMomentOfInertiaB);
+    return (numerator / denominator) / collisionManifold.ContactPointCount;
 }

@@ -29,6 +29,9 @@ public:
     virtual void Update(float deltaTime, glm::vec2 gravity);
     virtual void OnCollision();
     virtual void Move(glm::vec2 previousMousePosition, glm::vec2 currentMousePosition);
+    virtual float GetInverseMomentOfInertia();
+    virtual float GetAngularVelocity();
+    virtual void AddImpulseWithTorque(glm::vec2 impulse, glm::vec2 pointOfApplication);
 
     virtual bool Particle::IsMouseOverParticle(glm::vec2 mousePosition);
 

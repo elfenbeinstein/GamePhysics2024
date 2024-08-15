@@ -29,8 +29,10 @@ public:
     bool IsColliding(std::shared_ptr<Rectangle> rectangle, std::shared_ptr<AxisAlignedBox> box, CollisionManifold& collisionManifold);
 
     void ResolveCollision(std::shared_ptr<Particle> particle1, std::shared_ptr<Particle> particle2, CollisionManifold& collisionManifold);
-    void ResolveCollisionWithImpulsiveTorque(std::shared_ptr<RigidBody> rigidBodyA, std::shared_ptr<RigidBody> rigidBodyB, CollisionManifold& collisionManifold);
-    void ResolveCollisionWithImpulsiveTorque(std::shared_ptr<RigidBody> rigidBody, std::shared_ptr<Particle> particle, CollisionManifold& collisionManifold);
+    void ResolveCollisionWithImpulsiveTorque(std::shared_ptr<Particle> particleA, std::shared_ptr<Particle> particleB, CollisionManifold& collisionManifold);
+    float GetImpulseMagnitude(const glm::vec2& rA, const glm::vec2& rB, const float& coefficientOfRestitution, const float& separatingVelocity, 
+        const float& inverseMassA, const float& inverseMassB, const float& inverseMomentOfInertiaA, const float& inverseMomentOfInertiaB, 
+        CollisionManifold& collisionManifold);
     void SetCollisionCallback(CollisionCallback callback);
 
     glm::vec2 Gravity;

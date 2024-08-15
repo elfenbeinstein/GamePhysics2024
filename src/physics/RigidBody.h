@@ -47,6 +47,9 @@ public:
     void Update(float deltaTime, glm::vec2 gravity) override;
     void OnCollision() override;
     void Move(glm::vec2 previousMousePosition, glm::vec2 currentMousePosition) override;
-    void AddImpulseWithTorque(glm::vec2 impulse, glm::vec2 pointOfApplication);
+    void AddImpulseWithTorque(glm::vec2 impulse, glm::vec2 pointOfApplication) override;
     void AddTorque(float torque);
+
+    float GetInverseMomentOfInertia() override;
+    float GetAngularVelocity() override;
 };
