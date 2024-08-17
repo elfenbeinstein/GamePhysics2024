@@ -2,7 +2,7 @@
 
 World::World()
     : Gravity({0, -9.81f}),
-      ApplyDrag(false),
+      ApplyDrag(false), 
       ResolveCollisionsInelastic(false),
       ResolveCollisionsWithImpulsiveTorque(false) {}
 
@@ -387,15 +387,17 @@ void World::ResolveCollisionWithImpulsiveTorque(std::shared_ptr<Particle> partic
     float coefficient = particleA->CoefficientOfRestitution;
     if (particleB->CoefficientOfRestitution < coefficient)
         coefficient = particleB->CoefficientOfRestitution;
-    float impulseMagnitude = (-(1.0f + coefficient) *
-         glm::dot((particleB->Velocity - particleA->Velocity), collisionManifold.CollisionNormal)) /
-        (particleA->InverseMass + particleB->InverseMass);
     
     if ((particleA->Type == Particle::Circle && particleB->Type == Particle::Line) || 
         (particleA->Type == Particle::Line && particleB->Type == Particle::Circle) ||
         (collisionManifold.ContactPointCount == 2 && 
             (particleA->Type == Particle::Rectangle && (particleB->Type == Particle::Line || particleB->Type == Particle::AABB)) ||
             ((particleA->Type == Particle::Line || particleA->Type == Particle::AABB) && particleB->Type == Particle::Rectangle))) {
+        float impulseMagnitude =
+            (-(1.0f + coefficient) *
+             glm::dot((particleB->Velocity - particleA->Velocity),
+                      collisionManifold.CollisionNormal)) /
+            (particleA->InverseMass + particleB->InverseMass);
         particleA->AddImpulse(impulseMagnitude *
                               -collisionManifold.CollisionNormal);
         particleB->AddImpulse(impulseMagnitude *

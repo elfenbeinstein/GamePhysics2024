@@ -33,7 +33,8 @@ RigidBody::RigidBody(ParticleType type,
       AngularVelocity(0.0f),
       MomentOfInertia(momentOfInertia),
       InverseMomentOfInertia(0.0f),
-      TotalTorque(0.0f) {
+      TotalTorque(0.0f), 
+      MagneticFieldStrength(0.0f) {
     if (MomentOfInertia != 0.0f)
         InverseMomentOfInertia = 1.0f / MomentOfInertia;
 }
@@ -74,7 +75,8 @@ RigidBody::RigidBody(ParticleType type,
       AngularVelocity(angularVel),
       MomentOfInertia(momentOfInertia),
       InverseMomentOfInertia(0.0f),
-      TotalTorque(0.0f) {
+      TotalTorque(0.0f), 
+      MagneticFieldStrength(0.0f) {
     if (MomentOfInertia != 0.0f)
         InverseMomentOfInertia = 1.0f / MomentOfInertia;
 }

@@ -44,6 +44,7 @@ public:
     float TotalTorque;
     float MomentOfInertia;
     float InverseMomentOfInertia;
+    float MagneticFieldStrength;
     void Update(float deltaTime, glm::vec2 gravity) override;
     void OnCollision() override;
     void Move(glm::vec2 previousMousePosition, glm::vec2 currentMousePosition) override;

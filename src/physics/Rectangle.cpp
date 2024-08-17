@@ -40,7 +40,10 @@ Rectangle::Rectangle(glm::vec2 halfExtends,
 
 void Rectangle::Draw() {
     Draw::SetColor(Colour);
-    Draw::Rect(Position, Angle, HalfExtends);
+    if (MagneticFieldStrength > 0.0f)
+        Draw::Rect(Position, Angle, HalfExtends, true);
+    else
+        Draw::Rect(Position, Angle, HalfExtends);
     Draw::SetColor(Colors::white);
 }
 
